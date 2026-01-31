@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Navbar } from "@/components/Navbar";
-import { HeroSection } from "@/components/HeroSection";
-import { FeaturesSection } from "@/components/FeaturesSection";
-import { ImpactSection } from "@/components/ImpactSection";
-import { Footer } from "@/components/Footer";
+import { AuraNavbar } from "@/components/AuraNavbar";
+import { AuraHero } from "@/components/AuraHero";
+import { PulseSection } from "@/components/PulseSection";
+import { TransformationSection } from "@/components/TransformationSection";
+import { SymbiosisSection } from "@/components/SymbiosisSection";
+import { FinalCTA } from "@/components/FinalCTA";
+import { AuraFooter } from "@/components/AuraFooter";
 import { CaptureScreen } from "@/components/CaptureScreen";
 import { AIAnalysisResult } from "@/components/AIAnalysisResult";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
@@ -49,18 +51,26 @@ const Index = () => {
     return <IssuesMap onBack={handleGoHome} />;
   }
 
-  // Main landing page
+  // Main landing page - Aura design
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onTrackReports={handleTrackReports} onAdminDashboard={handleAdminDashboard} onMapView={handleMapView} />
+      <AuraNavbar 
+        onTrackReports={handleTrackReports} 
+        onAdminDashboard={handleAdminDashboard} 
+        onMapView={handleMapView} 
+      />
       <main>
-        <HeroSection onStartReport={handleStartReport} />
-        <section id="features">
-          <FeaturesSection onStartReport={handleStartReport} />
+        <AuraHero onStartReport={handleStartReport} />
+        <section id="pulse">
+          <PulseSection />
         </section>
-        <ImpactSection />
+        <TransformationSection />
+        <section id="impact">
+          <SymbiosisSection />
+        </section>
+        <FinalCTA onStartReport={handleStartReport} />
       </main>
-      <Footer />
+      <AuraFooter />
     </div>
   );
 };
