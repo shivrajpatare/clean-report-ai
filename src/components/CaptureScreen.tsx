@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Camera, X, RotateCcw, Sparkles, MapPin, Upload, Image } from "lucide-react";
+import { Camera, X, RotateCcw, Sparkles, MapPin, Upload, Image, Zap, ZapOff, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -21,12 +21,34 @@ export interface AnalysisResult {
   address: string;
 }
 
+type AIStatus = "ready" | "analyzing" | "error";
+
+const COMMUNITY_MESSAGES = [
+  "You're helping keep Pune clean 🌱",
+  "3,241 issues resolved this month",
+  "Join 12,000+ active citizens",
+  "Every report makes a difference ✨",
+];
+
 export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiStatus, setAiStatus] = useState<AIStatus>("ready");
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [address, setAddress] = useState<string>("Detecting location...");
+  const [flashEnabled, setFlashEnabled] = useState(false);
+  const [showCaptureFlash, setShowCaptureFlash] = useState(false);
+  const [communityMsgIndex, setCommunityMsgIndex] = useState(0);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Rotate community messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCommunityMsgIndex((prev) => (prev + 1) % COMMUNITY_MESSAGES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Get user's location on mount
   useEffect(() => {
@@ -70,6 +92,10 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   };
 
   const handleSimulateCapture = () => {
+    // Capture animation
+    setShowCaptureFlash(true);
+    setTimeout(() => setShowCaptureFlash(false), 200);
+    
     // For demo, create a placeholder image
     setCapturedImage("captured");
   };
@@ -78,6 +104,8 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
     if (!capturedImage) return;
     
     setIsAnalyzing(true);
+    setAiStatus("analyzing");
+    setAnalysisError(null);
     
     try {
       let imageUrl = capturedImage;
@@ -125,6 +153,8 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
         throw new Error('Failed to analyze image');
       }
 
+      setAiStatus("ready");
+      
       // Pass results to parent
       onCapture({
         imageUrl,
@@ -140,6 +170,8 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
 
     } catch (error) {
       console.error('Error during analysis:', error);
+      setAiStatus("error");
+      setAnalysisError("We couldn't clearly detect the issue. Try moving closer or improving lighting.");
       toast({
         title: "Analysis Failed",
         description: "Could not analyze the image. Please try again.",
@@ -152,7 +184,22 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   const handleRetake = () => {
     setCapturedImage(null);
     setIsAnalyzing(false);
+    setAiStatus("ready");
+    setAnalysisError(null);
   };
+
+  const getAIStatusConfig = () => {
+    switch (aiStatus) {
+      case "analyzing":
+        return { color: "bg-amber-500", text: "Analyzing...", icon: "🟡" };
+      case "error":
+        return { color: "bg-destructive", text: "Detection failed", icon: "🔴" };
+      default:
+        return { color: "bg-primary", text: "Ready to detect", icon: "🟢" };
+    }
+  };
+
+  const statusConfig = getAIStatusConfig();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-primary/5 to-secondary/10">
@@ -221,14 +268,27 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                         <p className="text-[6px] text-muted-foreground">Capture Moment</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 border border-primary/20">
-                      <Sparkles className="w-2.5 h-2.5 text-primary animate-pulse-glow" />
-                      <span className="text-[7px] font-medium text-primary">Ready</span>
+                    <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-colors ${
+                      aiStatus === "ready" ? "bg-primary/10 border-primary/20" :
+                      aiStatus === "analyzing" ? "bg-amber-500/10 border-amber-500/20" :
+                      "bg-destructive/10 border-destructive/20"
+                    }`}>
+                      <div className={`w-1.5 h-1.5 rounded-full ${statusConfig.color} animate-pulse`} />
+                      <span className={`text-[7px] font-medium ${
+                        aiStatus === "ready" ? "text-primary" :
+                        aiStatus === "analyzing" ? "text-amber-600 dark:text-amber-400" :
+                        "text-destructive"
+                      }`}>{statusConfig.text}</span>
                     </div>
                   </div>
                   
                   {/* Camera Preview Area */}
                   <div className="flex-1 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 border border-border/50 relative overflow-hidden">
+                    {/* Capture flash animation */}
+                    {showCaptureFlash && (
+                      <div className="absolute inset-0 bg-white z-30 animate-fade-out" style={{ animationDuration: "200ms" }} />
+                    )}
+                    
                     {capturedImage ? (
                       <>
                         {capturedImage === "captured" ? (
@@ -259,11 +319,29 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                             </div>
                           </div>
                         )}
+
+                        {/* Error Recovery Overlay */}
+                        {analysisError && !isAnalyzing && (
+                          <div className="absolute inset-0 bg-background/80 backdrop-blur-md flex items-center justify-center p-4">
+                            <div className="text-center space-y-2">
+                              <div className="w-10 h-10 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+                                <span className="text-lg">🔴</span>
+                              </div>
+                              <p className="text-[8px] text-foreground/70 leading-relaxed">{analysisError}</p>
+                              <button
+                                onClick={handleRetake}
+                                className="text-[7px] text-primary underline"
+                              >
+                                Try again
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <>
-                        {/* Empty Camera State */}
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        {/* Empty Camera State with Guidance */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
                           <div className="text-center space-y-2">
                             <div className="relative w-14 h-14 mx-auto">
                               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 blur-xl animate-pulse-glow" />
@@ -271,11 +349,25 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                                 <Camera className="w-7 h-7 text-primary/70" />
                               </div>
                             </div>
-                            <p className="text-[8px] text-foreground/60">Frame the Issue</p>
+                            <div className="space-y-1">
+                              <p className="text-[9px] text-foreground/70 font-medium">Frame the Issue</p>
+                              <p className="text-[7px] text-foreground/40 max-w-[120px] mx-auto leading-relaxed">
+                                Capture garbage, waste, or civic issue
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Frame guide hints */}
+                          <div className="absolute bottom-3 left-0 right-0 flex justify-center">
+                            <div className="px-2 py-1 rounded-full bg-foreground/5 backdrop-blur-sm">
+                              <p className="text-[6px] text-foreground/40 animate-pulse">
+                                Make sure full area is visible
+                              </p>
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Scan overlay corners */}
+                        {/* Scan overlay corners - functional guides */}
                         <div className="absolute inset-2 pointer-events-none">
                           <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-primary/40 rounded-tl-xl" />
                           <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-primary/40 rounded-tr-xl" />
@@ -289,10 +381,16 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                     )}
                   </div>
                   
-                  {/* Location Badge */}
-                  <div className="mt-2 flex items-center gap-2 px-2 py-1.5 rounded-full glass-card mx-auto max-w-[90%]">
-                    <MapPin className="w-3 h-3 text-primary/70 flex-shrink-0" />
-                    <span className="text-[7px] text-foreground/60 font-light truncate">{address}</span>
+                  {/* Location Badge with Privacy */}
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center gap-2 px-2 py-1.5 rounded-full glass-card mx-auto max-w-[90%]">
+                      <MapPin className="w-3 h-3 text-primary/70 flex-shrink-0" />
+                      <span className="text-[7px] text-foreground/60 font-light truncate">{address}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1 opacity-60">
+                      <Shield className="w-2 h-2 text-foreground/40" />
+                      <span className="text-[5px] text-foreground/40">Location shared only for this report</span>
+                    </div>
                   </div>
                   
                   {/* Bottom Controls */}
@@ -319,29 +417,55 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex items-center justify-between">
-                        {/* Gallery */}
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="w-10 h-10 rounded-xl bg-muted/60 border border-border/50 flex items-center justify-center hover:bg-muted/80 transition-colors"
-                        >
-                          <Upload className="w-4 h-4 text-foreground/60" />
-                        </button>
-                        
-                        {/* Capture Button */}
-                        <button
-                          onClick={handleSimulateCapture}
-                          className="relative group"
-                        >
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary via-primary to-secondary p-[3px] shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:shadow-primary/40 transition-shadow">
-                            <div className="w-full h-full rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                              <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/80 group-hover:scale-95 transition-transform" />
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          {/* Gallery Upload */}
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-10 h-10 rounded-xl bg-muted/60 border border-border/50 flex flex-col items-center justify-center hover:bg-muted/80 transition-colors gap-0.5"
+                          >
+                            <Upload className="w-3.5 h-3.5 text-foreground/60" />
+                            <span className="text-[5px] text-foreground/40">Gallery</span>
+                          </button>
+                          
+                          {/* Capture Button */}
+                          <button
+                            onClick={handleSimulateCapture}
+                            className="relative group"
+                          >
+                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary via-primary to-secondary p-[3px] shadow-lg shadow-primary/30 group-hover:shadow-xl group-hover:shadow-primary/40 transition-shadow group-active:scale-95">
+                              <div className="w-full h-full rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                <div className="w-11 h-11 rounded-full bg-white/90 dark:bg-white/80 group-hover:scale-95 transition-transform" />
+                              </div>
                             </div>
-                          </div>
-                        </button>
+                          </button>
+                          
+                          {/* Flash Toggle */}
+                          <button
+                            onClick={() => setFlashEnabled(!flashEnabled)}
+                            className={`w-10 h-10 rounded-xl border flex flex-col items-center justify-center transition-colors gap-0.5 ${
+                              flashEnabled 
+                                ? "bg-primary/20 border-primary/30" 
+                                : "bg-muted/60 border-border/50 hover:bg-muted/80"
+                            }`}
+                          >
+                            {flashEnabled ? (
+                              <Zap className="w-3.5 h-3.5 text-primary" />
+                            ) : (
+                              <ZapOff className="w-3.5 h-3.5 text-foreground/60" />
+                            )}
+                            <span className={`text-[5px] ${flashEnabled ? "text-primary" : "text-foreground/40"}`}>
+                              Flash
+                            </span>
+                          </button>
+                        </div>
                         
-                        {/* Placeholder for symmetry */}
-                        <div className="w-10 h-10" />
+                        {/* Community Motivation */}
+                        <div className="text-center h-4 overflow-hidden">
+                          <p className="text-[6px] text-foreground/40 animate-fade-in" key={communityMsgIndex}>
+                            {COMMUNITY_MESSAGES[communityMsgIndex]}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
