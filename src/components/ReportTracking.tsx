@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle, AlertCircle, Truck, MessageSquare, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, CheckCircle, AlertCircle, Truck, MessageSquare, ChevronRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface ReportTrackingProps {
   onBack: () => void;
@@ -9,37 +8,37 @@ interface ReportTrackingProps {
 
 const mockReports = [
   {
-    id: "CSA-2024-00847",
+    id: "AUR-2024-00847",
     location: "FC Road, Shivajinagar",
-    type: "Street Garbage",
+    type: "Street Friction",
     status: "pending",
     date: "Today, 10:30 AM",
     updates: [
-      { time: "10:30 AM", message: "Report submitted", type: "submitted" },
+      { time: "10:30 AM", message: "Ripple entered the flow", type: "submitted" },
     ],
   },
   {
-    id: "CSA-2024-00832",
+    id: "AUR-2024-00832",
     location: "Koregaon Park",
-    type: "Construction Debris",
+    type: "Construction Residue",
     status: "progress",
     date: "Yesterday",
     updates: [
-      { time: "9:00 AM", message: "Report submitted", type: "submitted" },
-      { time: "2:30 PM", message: "Assigned to cleanup crew", type: "assigned" },
-      { time: "Today, 8:00 AM", message: "Crew en route", type: "progress" },
+      { time: "9:00 AM", message: "Ripple entered the flow", type: "submitted" },
+      { time: "2:30 PM", message: "Keeper team assigned", type: "assigned" },
+      { time: "Today, 8:00 AM", message: "Restoration in progress", type: "progress" },
     ],
   },
   {
-    id: "CSA-2024-00798",
+    id: "AUR-2024-00798",
     location: "Kothrud, Paud Road",
-    type: "Organic Waste",
+    type: "Organic Matter",
     status: "resolved",
     date: "2 days ago",
     updates: [
-      { time: "Mon, 8:00 AM", message: "Report submitted", type: "submitted" },
-      { time: "Mon, 11:00 AM", message: "Assigned to cleanup crew", type: "assigned" },
-      { time: "Mon, 3:00 PM", message: "Cleanup completed", type: "resolved" },
+      { time: "Mon, 8:00 AM", message: "Ripple entered the flow", type: "submitted" },
+      { time: "Mon, 11:00 AM", message: "Keeper team assigned", type: "assigned" },
+      { time: "Mon, 3:00 PM", message: "Space restored to beauty", type: "resolved" },
     ],
   },
 ];
@@ -50,80 +49,103 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
-        return <Badge variant="pending">Pending Review</Badge>;
+        return (
+          <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 border border-warning/20">
+            <span className="w-2 h-2 rounded-full bg-warning animate-pulse" />
+            <span className="text-sm text-warning font-light">Awaiting Flow</span>
+          </span>
+        );
       case "progress":
-        return <Badge variant="progress">In Progress</Badge>;
+        return (
+          <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20">
+            <span className="w-2 h-2 rounded-full bg-secondary animate-pulse" />
+            <span className="text-sm text-secondary font-light">In Flow</span>
+          </span>
+        );
       case "resolved":
-        return <Badge variant="resolved">Resolved</Badge>;
+        return (
+          <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 border border-success/20">
+            <span className="w-2 h-2 rounded-full bg-success" />
+            <span className="text-sm text-success font-light">Restored</span>
+          </span>
+        );
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return null;
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
-        return <AlertCircle className="w-5 h-5 text-warning" />;
+        return <AlertCircle className="w-6 h-6 text-warning" />;
       case "progress":
-        return <Truck className="w-5 h-5 text-secondary" />;
+        return <Truck className="w-6 h-6 text-secondary" />;
       case "resolved":
-        return <CheckCircle className="w-5 h-5 text-success" />;
+        return <CheckCircle className="w-6 h-6 text-success" />;
       default:
-        return <Clock className="w-5 h-5 text-muted-foreground" />;
+        return <Clock className="w-6 h-6 text-foreground/40" />;
     }
   };
 
   if (selectedReport) {
     return (
-      <div className="fixed inset-0 bg-background z-50 flex flex-col">
+      <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-background via-primary/5 to-secondary/10">
+        {/* Ambient background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-drift" />
+          <div className="absolute bottom-40 left-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-3s" }} />
+        </div>
+
         {/* Header */}
-        <div className="flex items-center gap-4 p-4 border-b border-border">
-          <Button variant="ghost" size="icon" onClick={() => setSelectedReport(null)}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <h2 className="font-semibold">Report Details</h2>
-            <p className="text-sm text-muted-foreground">{selectedReport.id}</p>
+        <div className="relative p-4">
+          <div className="glass-panel rounded-2xl px-5 py-4 flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => setSelectedReport(null)} className="rounded-xl hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1">
+              <h2 className="font-medium text-foreground/80">Ripple Details</h2>
+              <p className="text-sm text-foreground/50 font-mono">{selectedReport.id}</p>
+            </div>
+            {getStatusBadge(selectedReport.status)}
           </div>
-          {getStatusBadge(selectedReport.status)}
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Report Info */}
-          <div className="civic-card p-4 space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
+          <div className="glass-panel p-6 rounded-2xl">
+            <div className="flex items-start gap-5">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center animate-breath">
                 {getStatusIcon(selectedReport.status)}
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold">{selectedReport.type}</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <h3 className="text-lg font-light text-foreground/90">{selectedReport.type}</h3>
+                <div className="flex items-center gap-2 text-sm text-foreground/50 mt-1">
                   <MapPin className="w-4 h-4" />
-                  {selectedReport.location}
+                  <span className="font-light">{selectedReport.location}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Timeline */}
-          <div className="space-y-3">
-            <h3 className="font-semibold">Status Timeline</h3>
-            <div className="space-y-0">
+          <div className="space-y-4">
+            <h3 className="font-medium text-foreground/70 tracking-wide px-2">Flow Timeline</h3>
+            <div className="glass-panel rounded-2xl p-6">
               {selectedReport.updates.map((update, index) => (
                 <div key={index} className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className={`w-3 h-3 rounded-full ${
+                    <div className={`w-4 h-4 rounded-full ${
                       index === selectedReport.updates.length - 1 
-                        ? 'bg-primary ring-4 ring-primary/20' 
-                        : 'bg-muted-foreground/30'
+                        ? 'bg-gradient-to-br from-primary to-secondary ring-4 ring-primary/20' 
+                        : 'bg-foreground/20'
                     }`} />
                     {index < selectedReport.updates.length - 1 && (
-                      <div className="w-0.5 h-16 bg-border" />
+                      <div className="w-0.5 h-16 bg-gradient-to-b from-foreground/20 to-foreground/5" />
                     )}
                   </div>
-                  <div className="pb-6">
-                    <p className="text-sm font-medium">{update.message}</p>
-                    <p className="text-xs text-muted-foreground">{update.time}</p>
+                  <div className="pb-8">
+                    <p className="text-sm font-light text-foreground/80">{update.message}</p>
+                    <p className="text-xs text-foreground/40 font-light mt-1">{update.time}</p>
                   </div>
                 </div>
               ))}
@@ -132,10 +154,10 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
 
           {/* Actions */}
           {selectedReport.status !== "resolved" && (
-            <div className="civic-card p-4">
-              <Button variant="outline" className="w-full">
-                <MessageSquare className="w-4 h-4" />
-                Send Feedback to Officials
+            <div className="glass-panel p-4 rounded-2xl">
+              <Button variant="ghost" className="w-full rounded-xl hover:bg-white/10 text-foreground/60 font-light">
+                <MessageSquare className="w-5 h-5 mr-2" />
+                Send Message to Keepers
               </Button>
             </div>
           )}
@@ -145,49 +167,67 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-background via-primary/5 to-secondary/10">
+      {/* Ambient background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-drift" />
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-3s" }} />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b border-border">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div>
-          <h2 className="font-semibold">My Reports</h2>
-          <p className="text-sm text-muted-foreground">{mockReports.length} reports submitted</p>
+      <div className="relative p-4">
+        <div className="glass-panel rounded-2xl px-5 py-4 flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl hover:bg-white/10">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h2 className="font-medium text-foreground/80 tracking-wide">My Ripples</h2>
+            <p className="text-sm text-foreground/50 font-light">{mockReports.length} observations flowing</p>
+          </div>
         </div>
       </div>
 
       {/* Reports List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {mockReports.map((report) => (
           <button
             key={report.id}
-            className="w-full civic-card p-4 text-left transition-all hover:shadow-card-hover"
+            className="w-full glass-panel p-5 rounded-2xl text-left transition-all duration-300 hover:bg-white/10 hover:scale-[1.01] group"
             onClick={() => setSelectedReport(report)}
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center shrink-0">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
                 {getStatusIcon(report.status)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-semibold truncate">{report.type}</h3>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <h3 className="font-light text-foreground/90 text-lg">{report.type}</h3>
+                    <div className="flex items-center gap-2 text-sm text-foreground/50 mt-1">
                       <MapPin className="w-3 h-3" />
-                      <span className="truncate">{report.location}</span>
+                      <span className="truncate font-light">{report.location}</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-foreground/30 shrink-0 group-hover:translate-x-1 transition-transform duration-300" />
                 </div>
-                <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center justify-between mt-4">
                   {getStatusBadge(report.status)}
-                  <span className="text-xs text-muted-foreground">{report.date}</span>
+                  <span className="text-xs text-foreground/40 font-light">{report.date}</span>
                 </div>
               </div>
             </div>
           </button>
         ))}
+      </div>
+
+      {/* Footer hint */}
+      <div className="p-4">
+        <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-full glass-card">
+          <Sparkles className="w-5 h-5 text-primary animate-pulse-glow" />
+          <p className="text-sm text-foreground/50 font-light">
+            Every ripple you create helps the city breathe
+          </p>
+        </div>
       </div>
     </div>
   );

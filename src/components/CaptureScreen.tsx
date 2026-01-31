@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
-import { Camera, X, RotateCcw, Zap, MapPin, Upload, Image } from "lucide-react";
+import { Camera, X, RotateCcw, Sparkles, MapPin, Upload, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 interface CaptureScreenProps {
   onCapture: (imageData: string) => void;
@@ -26,7 +25,6 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   };
 
   const handleSimulateCapture = () => {
-    // Simulate capture with a placeholder
     setCapturedImage("captured");
   };
 
@@ -43,28 +41,39 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-gradient-to-b from-background via-primary/5 to-secondary/10">
+      {/* Ambient background orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-drift" />
+        <div className="absolute bottom-40 right-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-3s" }} />
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="w-5 h-5" />
-        </Button>
-        <h2 className="font-semibold">Report Issue</h2>
-        <Badge variant="ai" className="text-xs">
-          <Zap className="w-3 h-3 mr-1" />
-          AI Ready
-        </Badge>
+      <div className="relative flex items-center justify-between p-4">
+        <button
+          onClick={onClose}
+          className="p-3 rounded-2xl glass-card hover:bg-white/20 transition-all duration-300"
+        >
+          <X className="w-5 h-5 text-foreground/70" />
+        </button>
+        <h2 className="font-medium text-foreground/80 tracking-wide">Capture Moment</h2>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-full glass-card">
+          <Sparkles className="w-4 h-4 text-primary animate-pulse-glow" />
+          <span className="text-sm font-light text-foreground/70">Aura Ready</span>
+        </div>
       </div>
 
       {/* Camera Area */}
-      <div className="flex-1 relative bg-muted">
+      <div className="flex-1 relative m-4 rounded-3xl overflow-hidden glass-card">
         {capturedImage ? (
           <div className="absolute inset-0 flex items-center justify-center">
             {capturedImage === "captured" ? (
-              <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/10 flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <Image className="w-16 h-16 mx-auto text-muted-foreground/50" />
-                  <p className="text-muted-foreground">Image Captured</p>
+              <div className="w-full h-full bg-gradient-to-br from-primary/5 to-secondary/10 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center animate-breath">
+                    <Image className="w-10 h-10 text-primary/60" />
+                  </div>
+                  <p className="text-foreground/60 font-light">Moment Captured</p>
                 </div>
               </div>
             ) : (
@@ -73,24 +82,30 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
             
             {/* AI Analysis Overlay */}
             {isAnalyzing && (
-              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                <div className="text-center space-y-6">
+              <div className="absolute inset-0 bg-background/60 backdrop-blur-xl flex items-center justify-center">
+                <div className="text-center space-y-8">
+                  {/* Pulsing orb */}
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full border-4 border-primary/30 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-                    </div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Zap className="w-8 h-8 text-primary" />
+                    <div className="absolute inset-0 w-32 h-32 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 blur-xl animate-pulse-glow" />
+                    <div className="relative w-32 h-32 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm flex items-center justify-center animate-breath">
+                      <div className="w-24 h-24 rounded-full border-2 border-primary/30 border-t-primary animate-spin" style={{ animationDuration: "2s" }} />
+                      <Sparkles className="absolute w-10 h-10 text-primary animate-pulse" />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <p className="font-semibold text-lg">AI Analyzing...</p>
-                    <p className="text-sm text-muted-foreground">Detecting waste type & severity</p>
+                  <div className="space-y-3">
+                    <p className="text-xl font-light tracking-wide text-foreground/80">Sensing...</p>
+                    <p className="text-sm text-foreground/50 font-light">Aura is understanding the moment</p>
                   </div>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    <Badge variant="ai">Scanning Image</Badge>
-                    <Badge variant="secondary">Detecting Objects</Badge>
-                    <Badge variant="outline">Locating GPS</Badge>
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in">
+                      Perceiving
+                    </span>
+                    <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                      Categorizing
+                    </span>
+                    <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+                      Locating
+                    </span>
                   </div>
                 </div>
               </div>
@@ -98,81 +113,113 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
           </div>
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center space-y-8">
-            {/* Camera Viewfinder */}
+            {/* Organic Viewfinder */}
             <div className="relative">
-              <div className="w-64 h-64 border-2 border-dashed border-primary/50 rounded-2xl flex items-center justify-center">
-                <div className="text-center space-y-4">
-                  <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center ai-pulse">
-                    <Camera className="w-10 h-10 text-primary" />
+              <div className="w-72 h-72 rounded-[3rem] glass-panel flex items-center justify-center">
+                <div className="text-center space-y-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 blur-2xl animate-pulse-glow" />
+                    <div className="relative w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center animate-breath">
+                      <Camera className="w-12 h-12 text-primary/70" />
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <p className="font-medium">Capture Waste</p>
-                    <p className="text-sm text-muted-foreground">Point camera at the issue</p>
+                  <div className="space-y-2">
+                    <p className="text-lg font-light text-foreground/80">Frame the Friction</p>
+                    <p className="text-sm text-foreground/50 font-light">
+                      Capture what disrupts the flow
+                    </p>
                   </div>
                 </div>
               </div>
               
-              {/* Corner Markers */}
-              <div className="absolute -top-1 -left-1 w-6 h-6 border-t-2 border-l-2 border-primary rounded-tl-lg" />
-              <div className="absolute -top-1 -right-1 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg" />
-              <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg" />
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-lg" />
+              {/* Organic corner accents */}
+              <div className="absolute -top-2 -left-2 w-12 h-12 border-t-2 border-l-2 border-primary/30 rounded-tl-3xl" />
+              <div className="absolute -top-2 -right-2 w-12 h-12 border-t-2 border-r-2 border-primary/30 rounded-tr-3xl" />
+              <div className="absolute -bottom-2 -left-2 w-12 h-12 border-b-2 border-l-2 border-primary/30 rounded-bl-3xl" />
+              <div className="absolute -bottom-2 -right-2 w-12 h-12 border-b-2 border-r-2 border-primary/30 rounded-br-3xl" />
             </div>
             
             {/* Location Indicator */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-card rounded-full shadow-md">
-              <MapPin className="w-4 h-4 text-primary" />
-              <span className="text-sm">Location will be auto-detected</span>
+            <div className="flex items-center gap-3 px-5 py-3 rounded-full glass-card">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-primary/70" />
+              </div>
+              <span className="text-sm text-foreground/60 font-light">Location will flow automatically</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Controls */}
-      <div className="p-6 bg-card border-t border-border">
-        {capturedImage ? (
-          <div className="flex gap-4">
-            <Button variant="outline" size="lg" className="flex-1" onClick={handleRetake} disabled={isAnalyzing}>
-              <RotateCcw className="w-5 h-5" />
-              Retake
-            </Button>
-            <Button variant="hero" size="lg" className="flex-1" onClick={handleAnalyze} disabled={isAnalyzing}>
-              {isAnalyzing ? (
-                <>Analyzing...</>
-              ) : (
-                <>
-                  <Zap className="w-5 h-5" />
-                  Analyze with AI
-                </>
-              )}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
+      <div className="relative p-6">
+        <div className="glass-panel p-6 rounded-3xl">
+          {capturedImage ? (
             <div className="flex gap-4">
-              <Button variant="hero" size="xl" className="flex-1" onClick={handleSimulateCapture}>
-                <Camera className="w-5 h-5" />
-                Capture Photo
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 h-14 rounded-2xl border-white/20 bg-white/5 hover:bg-white/10 font-light"
+                onClick={handleRetake}
+                disabled={isAnalyzing}
+              >
+                <RotateCcw className="w-5 h-5 mr-2" />
+                Recapture
               </Button>
+              <button
+                onClick={handleAnalyze}
+                disabled={isAnalyzing}
+                className="flex-1 h-14 rounded-2xl bg-gradient-to-r from-primary/80 to-secondary/80 
+                         text-white font-light flex items-center justify-center gap-2
+                         hover:from-primary hover:to-secondary transition-all duration-500
+                         disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+              >
+                {isAnalyzing ? (
+                  <>Sensing...</>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Let Aura Sense
+                  </>
+                )}
+              </button>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 h-px bg-border" />
-              <span className="text-xs text-muted-foreground">or</span>
-              <div className="flex-1 h-px bg-border" />
+          ) : (
+            <div className="space-y-4">
+              <button
+                onClick={handleSimulateCapture}
+                className="w-full h-16 rounded-2xl bg-gradient-to-r from-primary/80 to-secondary/80 
+                         text-white font-light flex items-center justify-center gap-3
+                         hover:from-primary hover:to-secondary transition-all duration-500
+                         shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30
+                         hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Camera className="w-6 h-6" />
+                Capture Moment
+              </button>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+                <span className="text-xs text-foreground/40 font-light">or</span>
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+              </div>
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full h-14 rounded-2xl border-white/20 bg-white/5 hover:bg-white/10 font-light"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                Choose from Gallery
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </div>
-            <Button variant="outline" size="lg" className="w-full" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="w-5 h-5" />
-              Upload from Gallery
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
