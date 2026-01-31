@@ -1,22 +1,15 @@
 import { useState, useEffect } from "react";
-import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, Filter, Download, RefreshCw, ArrowLeft, Sparkles, Flame, Droplets, LogIn, LogOut, Shield } from "lucide-react";
+import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, RefreshCw, ArrowLeft, Sparkles, LogIn, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { User } from "@supabase/supabase-js";
+import { AdminMapPanel, type MapReport } from "./admin/AdminMapPanel";
+import { ReportDetailPanel } from "./admin/ReportDetailPanel";
 
 interface AdminDashboardProps {
   onBack: () => void;
-}
-
-interface Report {
-  id: string;
-  category: string;
-  priority: string;
-  status: string;
-  address: string;
-  created_at: string;
 }
 
 interface Stats {
@@ -46,10 +39,11 @@ const priorityEmoji: Record<string, string> = {
 };
 
 export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
-  const [reports, setReports] = useState<Report[]>([]);
+  const [reports, setReports] = useState<MapReport[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, inProgress: 0, resolved: 0 });
   const [loading, setLoading] = useState(true);
-  const [categoryStats, setCategoryStats] = useState<Record<string, number>>({});
+  const [selectedReport, setSelectedReport] = useState<MapReport | null>(null);
+  const [showHighPriorityOnly, setShowHighPriorityOnly] = useState(false);
   
   // Authentication state
   const [user, setUser] = useState<User | null>(null);
@@ -67,7 +61,6 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Check if user has admin role
           const { data: roles } = await supabase
             .from('user_roles')
             .select('role')
@@ -133,7 +126,6 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     if (!isAdmin) return;
     setLoading(true);
     try {
-      // Use public_reports view for reading (excludes PII)
       const { data: reportsData, error } = await supabase
         .from('public_reports')
         .select('*')
@@ -141,10 +133,9 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
 
       if (error) throw error;
 
-      const allReports = (reportsData || []) as Report[];
-      setReports(allReports.slice(0, 10)); // Recent 10 for display
+      const allReports = (reportsData || []) as MapReport[];
+      setReports(allReports);
 
-      // Calculate stats
       const newStats = {
         total: allReports.length,
         pending: allReports.filter(r => r.status === 'pending').length,
@@ -152,13 +143,6 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         resolved: allReports.filter(r => r.status === 'resolved').length,
       };
       setStats(newStats);
-
-      // Calculate category breakdown
-      const catStats: Record<string, number> = {};
-      allReports.forEach(r => {
-        catStats[r.category] = (catStats[r.category] || 0) + 1;
-      });
-      setCategoryStats(catStats);
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -180,7 +164,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
 
   const handleUpdateStatus = async (reportId: string, newStatus: string) => {
     try {
-      const updateData: any = { status: newStatus };
+      const updateData: Record<string, unknown> = { status: newStatus };
       if (newStatus === 'resolved') {
         updateData.resolved_at = new Date().toISOString();
       }
@@ -197,6 +181,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         description: `Report marked as ${newStatus.replace('_', ' ')}`,
       });
       
+      setSelectedReport(null);
       fetchData();
     } catch (error) {
       console.error('Error updating status:', error);
@@ -215,6 +200,14 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     return date.toLocaleDateString();
   };
 
+  const handleSelectReportFromList = (report: MapReport) => {
+    setSelectedReport(report);
+  };
+
+  const handleSelectReportFromMap = (report: MapReport) => {
+    setSelectedReport(report);
+  };
+
   const statsConfig = [
     { label: "Total Reports", value: stats.total, icon: BarChart3, gradient: "from-primary/20 to-secondary/20" },
     { label: "Pending", value: stats.pending, icon: Clock, gradient: "from-warning/20 to-orange-500/20" },
@@ -222,7 +215,8 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     { label: "Resolved", value: stats.resolved, icon: CheckCircle, gradient: "from-success/20 to-emerald-500/20" },
   ];
 
-  const criticalReports = reports.filter(r => r.priority === 'critical' || r.priority === 'high');
+  const recentReports = reports.slice(0, 15);
+  const criticalCount = reports.filter(r => r.priority === 'critical' || r.priority === 'high').length;
 
   // Show loading state
   if (authLoading) {
@@ -360,11 +354,18 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="font-medium text-lg text-foreground/90 tracking-wide">Admin Dashboard</h1>
+                <h1 className="font-medium text-lg text-foreground/90 tracking-wide">City Control Room</h1>
                 <p className="text-xs text-foreground/50 font-light">Signed in as {user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {criticalCount > 0 && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 mr-2">
+                  <AlertTriangle className="w-4 h-4 text-destructive animate-pulse" />
+                  <span className="text-sm font-medium text-destructive">{criticalCount}</span>
+                  <span className="text-xs text-destructive/70 hidden sm:inline">critical</span>
+                </div>
+              )}
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -408,124 +409,83 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Recent Reports */}
-          <div className="lg:col-span-2 glass-panel rounded-2xl overflow-hidden">
+        {/* Two Column Layout - Reports List + Map */}
+        <div className="grid lg:grid-cols-2 gap-6" style={{ minHeight: '600px' }}>
+          {/* Left Column - Reports List */}
+          <div className="glass-panel rounded-2xl overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-5 border-b border-white/10">
               <h2 className="font-medium text-foreground/80 tracking-wide">Recent Reports</h2>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-card">
+                <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                <span className="text-xs font-light text-foreground/60">{recentReports.length} reports</span>
+              </div>
             </div>
-            <div className="divide-y divide-white/5 max-h-[500px] overflow-y-auto">
+            <div className="divide-y divide-white/5 flex-1 overflow-y-auto max-h-[500px]">
               {loading ? (
                 <div className="p-10 flex justify-center">
                   <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
                 </div>
-              ) : reports.length === 0 ? (
+              ) : recentReports.length === 0 ? (
                 <div className="p-10 text-center text-foreground/50">No reports yet</div>
               ) : (
-                reports.map((report) => (
-                  <div key={report.id} className="p-5 flex items-center gap-4 hover:bg-white/5 transition-colors">
-                    <div className={`w-3 h-3 rounded-full ${
+                recentReports.map((report) => (
+                  <button
+                    key={report.id}
+                    onClick={() => handleSelectReportFromList(report)}
+                    className={`w-full p-4 flex items-center gap-4 hover:bg-white/5 transition-all text-left ${
+                      selectedReport?.id === report.id ? 'bg-primary/10 border-l-2 border-primary' : ''
+                    }`}
+                  >
+                    <div className={`w-3 h-3 rounded-full shrink-0 ${
                       report.priority === 'critical' || report.priority === 'high' ? 'bg-destructive animate-pulse' :
-                      report.priority === 'medium' ? 'bg-warning' : 'bg-success'
+                      report.priority === 'medium' ? 'bg-warning' : 'bg-amber-400'
                     }`} />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-lg">{priorityEmoji[report.priority] || '🟡'}</span>
-                        <span className="px-3 py-1 rounded-full glass-card text-xs text-foreground/60">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-base">{priorityEmoji[report.priority] || '🟡'}</span>
+                        <span className="px-2 py-0.5 rounded-full glass-card text-xs text-foreground/60">
                           {categoryLabels[report.category] || report.category}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-light ${
+                          report.status === 'resolved' ? 'bg-success/10 text-success' :
+                          report.status === 'in_progress' ? 'bg-secondary/10 text-secondary' : 
+                          'bg-warning/10 text-warning'
+                        }`}>
+                          {report.status.replace('_', ' ')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-foreground/40 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        <span className="font-light truncate">{report.address}</span>
+                        <MapPin className="w-3 h-3 shrink-0" />
+                        <span className="font-light truncate">{report.address || 'No address'}</span>
                       </div>
                     </div>
-                    <div className="text-right flex flex-col items-end gap-2">
-                      <span className={`px-3 py-1 rounded-full text-xs font-light ${
-                        report.status === 'resolved' ? 'bg-success/10 text-success' :
-                        report.status === 'in_progress' ? 'bg-secondary/10 text-secondary' : 
-                        'bg-warning/10 text-warning'
-                      }`}>
-                        {report.status.replace('_', ' ')}
-                      </span>
+                    <div className="text-right shrink-0">
                       <p className="text-xs text-foreground/40 font-light">{formatDate(report.created_at)}</p>
                     </div>
-                    {report.status === 'pending' && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="rounded-xl hover:bg-primary/10 text-primary"
-                        onClick={() => handleUpdateStatus(report.id, 'in_progress')}
-                      >
-                        Assign
-                      </Button>
-                    )}
-                    {report.status === 'in_progress' && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="rounded-xl hover:bg-success/10 text-success"
-                        onClick={() => handleUpdateStatus(report.id, 'resolved')}
-                      >
-                        Resolve
-                      </Button>
-                    )}
-                  </div>
+                  </button>
                 ))
               )}
             </div>
           </div>
 
-          {/* Category Breakdown */}
-          <div className="glass-panel rounded-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-white/10">
-              <h2 className="font-medium text-foreground/80 tracking-wide">By Category</h2>
-            </div>
-            <div className="p-5 space-y-4">
-              {Object.entries(categoryStats).length === 0 ? (
-                <p className="text-foreground/50 text-sm text-center py-4">No data</p>
-              ) : (
-                Object.entries(categoryStats)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 6)
-                  .map(([category, count]) => (
-                    <div key={category} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="font-light text-foreground/70">
-                          {categoryLabels[category] || category}
-                        </span>
-                        <span className="font-light text-foreground/50">{count}</span>
-                      </div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
-                          style={{ width: `${Math.min(100, (count / stats.total) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))
-              )}
-            </div>
-          </div>
+          {/* Right Column - Map */}
+          <AdminMapPanel
+            reports={reports}
+            selectedReportId={selectedReport?.id || null}
+            onSelectReport={handleSelectReportFromMap}
+            showHighPriorityOnly={showHighPriorityOnly}
+            onToggleHighPriority={setShowHighPriorityOnly}
+          />
         </div>
-
-        {/* Critical Alert Banner */}
-        {criticalReports.length > 0 && (
-          <div className="glass-panel p-5 rounded-2xl border-l-4 border-destructive bg-gradient-to-r from-destructive/5 to-transparent">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-medium text-foreground/80">High Priority Alerts</h3>
-                <p className="text-sm text-foreground/50 font-light mt-1">
-                  {criticalReports.length} critical/high priority report{criticalReports.length > 1 ? 's' : ''} requiring immediate attention
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
       </main>
+
+      {/* Report Detail Panel */}
+      <ReportDetailPanel
+        report={selectedReport}
+        onClose={() => setSelectedReport(null)}
+        onUpdateStatus={handleUpdateStatus}
+        categoryLabels={categoryLabels}
+      />
     </div>
   );
 };
