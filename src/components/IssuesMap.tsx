@@ -36,20 +36,20 @@ const statusIcons = {
   resolved: createCustomIcon("hsl(142, 71%, 45%)"),
 };
 
-// Mock data - Bengaluru area reports
+// Mock data - Pune area reports
 const mockReports = [
-  { id: "CSA-2024-00847", location: "MG Road, Ward 76", type: "Street Garbage", status: "pending", date: "Today, 10:30 AM", lat: 12.9758, lng: 77.6045, severity: "high" },
-  { id: "CSA-2024-00832", location: "Koramangala 5th Block", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 12.9352, lng: 77.6245, severity: "medium" },
-  { id: "CSA-2024-00798", location: "Indiranagar 100ft Road", type: "Organic Waste", status: "resolved", date: "2 days ago", lat: 12.9784, lng: 77.6408, severity: "low" },
-  { id: "CSA-2024-00815", location: "HSR Layout Sector 2", type: "Street Garbage", status: "pending", date: "Today, 8:15 AM", lat: 12.9116, lng: 77.6389, severity: "high" },
-  { id: "CSA-2024-00820", location: "Whitefield Main Road", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 12.9698, lng: 77.7500, severity: "medium" },
-  { id: "CSA-2024-00788", location: "Jayanagar 4th Block", type: "Organic Waste", status: "resolved", date: "3 days ago", lat: 12.9299, lng: 77.5826, severity: "low" },
-  { id: "CSA-2024-00795", location: "BTM Layout 2nd Stage", type: "Street Garbage", status: "pending", date: "Today, 9:00 AM", lat: 12.9166, lng: 77.6101, severity: "high" },
-  { id: "CSA-2024-00810", location: "Electronic City Phase 1", type: "Construction Debris", status: "progress", date: "2 days ago", lat: 12.8456, lng: 77.6603, severity: "medium" },
-  { id: "CSA-2024-00778", location: "Marathahalli Bridge", type: "Street Garbage", status: "resolved", date: "4 days ago", lat: 12.9591, lng: 77.6974, severity: "high" },
-  { id: "CSA-2024-00825", location: "Banashankari 3rd Stage", type: "Organic Waste", status: "pending", date: "Today, 7:45 AM", lat: 12.9255, lng: 77.5468, severity: "low" },
-  { id: "CSA-2024-00830", location: "Yelahanka New Town", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 13.1007, lng: 77.5963, severity: "medium" },
-  { id: "CSA-2024-00785", location: "Rajajinagar 1st Block", type: "Street Garbage", status: "resolved", date: "5 days ago", lat: 12.9900, lng: 77.5500, severity: "high" },
+  { id: "CSA-2024-00847", location: "FC Road, Shivajinagar", type: "Street Garbage", status: "pending", date: "Today, 10:30 AM", lat: 18.5285, lng: 73.8410, severity: "high" },
+  { id: "CSA-2024-00832", location: "Koregaon Park", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5362, lng: 73.8939, severity: "medium" },
+  { id: "CSA-2024-00798", location: "Kothrud, Paud Road", type: "Organic Waste", status: "resolved", date: "2 days ago", lat: 18.5074, lng: 73.8077, severity: "low" },
+  { id: "CSA-2024-00815", location: "Viman Nagar", type: "Street Garbage", status: "pending", date: "Today, 8:15 AM", lat: 18.5679, lng: 73.9143, severity: "high" },
+  { id: "CSA-2024-00820", location: "Hinjewadi Phase 1", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5912, lng: 73.7380, severity: "medium" },
+  { id: "CSA-2024-00788", location: "Aundh, ITI Road", type: "Organic Waste", status: "resolved", date: "3 days ago", lat: 18.5590, lng: 73.8077, severity: "low" },
+  { id: "CSA-2024-00795", location: "Hadapsar, Magarpatta", type: "Street Garbage", status: "pending", date: "Today, 9:00 AM", lat: 18.5089, lng: 73.9260, severity: "high" },
+  { id: "CSA-2024-00810", location: "Baner Road", type: "Construction Debris", status: "progress", date: "2 days ago", lat: 18.5590, lng: 73.7868, severity: "medium" },
+  { id: "CSA-2024-00778", location: "Kalyani Nagar", type: "Street Garbage", status: "resolved", date: "4 days ago", lat: 18.5463, lng: 73.9020, severity: "high" },
+  { id: "CSA-2024-00825", location: "Sinhagad Road", type: "Organic Waste", status: "pending", date: "Today, 7:45 AM", lat: 18.4818, lng: 73.8223, severity: "low" },
+  { id: "CSA-2024-00830", location: "Wakad", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5998, lng: 73.7603, severity: "medium" },
+  { id: "CSA-2024-00785", location: "Camp, MG Road", type: "Street Garbage", status: "resolved", date: "5 days ago", lat: 18.5167, lng: 73.8803, severity: "high" },
 ];
 
 type StatusFilter = "all" | "pending" | "progress" | "resolved";
@@ -75,7 +75,7 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = L.map(mapContainerRef.current).setView([12.9716, 77.5946], 12);
+    const map = L.map(mapContainerRef.current).setView([18.5204, 73.8567], 12);
     
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -185,7 +185,7 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
         </Button>
         <div className="flex-1">
           <h2 className="font-semibold">Issues Map</h2>
-          <p className="text-sm text-muted-foreground">{filteredReports.length} reports in Bengaluru</p>
+          <p className="text-sm text-muted-foreground">{filteredReports.length} reports in Pune</p>
         </div>
         <div className="flex items-center gap-2">
           <Layers className="w-4 h-4 text-muted-foreground" />

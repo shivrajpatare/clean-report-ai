@@ -10,7 +10,7 @@ interface ReportTrackingProps {
 const mockReports = [
   {
     id: "CSA-2024-00847",
-    location: "MG Road, Ward 76",
+    location: "FC Road, Shivajinagar",
     type: "Street Garbage",
     status: "pending",
     date: "Today, 10:30 AM",
@@ -20,7 +20,7 @@ const mockReports = [
   },
   {
     id: "CSA-2024-00832",
-    location: "Koramangala 5th Block",
+    location: "Koregaon Park",
     type: "Construction Debris",
     status: "progress",
     date: "Yesterday",
@@ -32,7 +32,7 @@ const mockReports = [
   },
   {
     id: "CSA-2024-00798",
-    location: "Indiranagar 100ft Road",
+    location: "Kothrud, Paud Road",
     type: "Organic Waste",
     status: "resolved",
     date: "2 days ago",

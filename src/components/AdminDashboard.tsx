@@ -14,11 +14,11 @@ const stats = [
 ];
 
 const recentReports = [
-  { id: "CSA-847", location: "MG Road", type: "Garbage", severity: "high", time: "10 min ago" },
-  { id: "CSA-846", location: "Koramangala", type: "Debris", severity: "medium", time: "25 min ago" },
-  { id: "CSA-845", location: "Indiranagar", type: "Organic", severity: "low", time: "1 hr ago" },
-  { id: "CSA-844", location: "Whitefield", type: "Garbage", severity: "high", time: "2 hr ago" },
-  { id: "CSA-843", location: "HSR Layout", type: "Debris", severity: "medium", time: "3 hr ago" },
+  { id: "CSA-847", location: "FC Road", type: "Garbage", severity: "high", time: "10 min ago" },
+  { id: "CSA-846", location: "Koregaon Park", type: "Debris", severity: "medium", time: "25 min ago" },
+  { id: "CSA-845", location: "Kothrud", type: "Organic", severity: "low", time: "1 hr ago" },
+  { id: "CSA-844", location: "Hinjewadi", type: "Garbage", severity: "high", time: "2 hr ago" },
+  { id: "CSA-843", location: "Viman Nagar", type: "Debris", severity: "medium", time: "3 hr ago" },
 ];
 
 const wardPerformance = [
@@ -38,7 +38,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
             <Button variant="ghost" onClick={onBack}>← Back</Button>
             <div>
               <h1 className="font-bold text-lg">Municipal Dashboard</h1>
-              <p className="text-xs text-muted-foreground">Bengaluru Urban • Last updated: 2 min ago</p>
+              <p className="text-xs text-muted-foreground">Pune Municipal Corporation • Last updated: 2 min ago</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
             <div className="flex-1">
               <h3 className="font-semibold">High Priority Alert</h3>
               <p className="text-sm text-muted-foreground">
-                3 high-severity reports in Koramangala area pending for over 48 hours. Immediate attention required.
+                3 high-severity reports in Koregaon Park area pending for over 48 hours. Immediate attention required.
               </p>
             </div>
             <Button variant="outline" size="sm">Review Now</Button>
