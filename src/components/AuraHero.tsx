@@ -1,49 +1,69 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles } from "lucide-react";
+
 interface AuraHeroProps {
   onStartReport: () => void;
 }
-export const AuraHero = ({
-  onStartReport
-}: AuraHeroProps) => {
-  const [mousePos, setMousePos] = useState({
-    x: 0,
-    y: 0
-  });
+
+export const AuraHero = ({ onStartReport }: AuraHeroProps) => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [scrollY, setScrollY] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (heroRef.current) {
         const rect = heroRef.current.getBoundingClientRect();
         setMousePos({
           x: e.clientX - rect.left,
-          y: e.clientY - rect.top
+          y: e.clientY - rect.top,
         });
       }
     };
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
-  return <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
+
+  return (
+    <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
       {/* Background - Ethereal Gradient with Motion */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10 animate-gradient-shift" />
       
-      {/* Animated Orbs */}
+      {/* Animated Orbs with Parallax */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-primary/20 dark:bg-primary/30 blur-ethereal animate-drift" style={{
-        top: '10%',
-        left: '10%'
-      }} />
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-secondary/20 dark:bg-secondary/30 blur-ethereal animate-float" style={{
-        bottom: '10%',
-        right: '10%',
-        animationDelay: '-2s'
-      }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full bg-primary/15 dark:bg-primary/25 blur-soft animate-breath" style={{
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
-      }} />
+        <div 
+          className="absolute w-[600px] h-[600px] rounded-full bg-primary/20 dark:bg-primary/30 blur-ethereal animate-drift transition-transform duration-100"
+          style={{
+            top: '10%',
+            left: '10%',
+            transform: `translateY(${scrollY * 0.15}px)`,
+          }} 
+        />
+        <div 
+          className="absolute w-[500px] h-[500px] rounded-full bg-secondary/20 dark:bg-secondary/30 blur-ethereal animate-float transition-transform duration-100"
+          style={{
+            bottom: '10%',
+            right: '10%',
+            animationDelay: '-2s',
+            transform: `translateY(${scrollY * 0.25}px)`,
+          }} 
+        />
+        <div 
+          className="absolute w-[400px] h-[400px] rounded-full bg-primary/15 dark:bg-primary/25 blur-soft animate-breath transition-transform duration-100"
+          style={{
+            top: '50%',
+            left: '50%',
+            transform: `translate(-50%, calc(-50% + ${scrollY * 0.1}px))`,
+          }} 
+        />
       </div>
 
       {/* Floating Lens Effect - follows cursor */}
@@ -118,6 +138,8 @@ export const AuraHero = ({
 
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent" />
-    </section>;
+    </section>
+  );
 };
+
 export default AuraHero;
