@@ -180,43 +180,61 @@ export const AuraHero = ({ onStartReport }: AuraHeroProps) => {
                         </div>
                       </div>
                       
-                      {/* Camera Preview Area */}
-                      <div className="flex-1 rounded-2xl bg-gradient-to-br from-muted/80 to-muted/40 border border-border/50 relative overflow-hidden">
-                        {/* Simulated urban scene */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-foreground/25 via-transparent to-muted/50" />
+                      {/* City Map Preview */}
+                      <div className="flex-1 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/10 border border-border/50 relative overflow-hidden">
+                        {/* Map background */}
+                        <div className="absolute inset-0 bg-[#e8f4e8] dark:bg-[#1a2f1a]" />
                         
-                        {/* Ground/Street */}
-                        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-muted-foreground/30 to-transparent" />
-                        
-                        {/* Buildings silhouette */}
-                        <div className="absolute bottom-12 left-3 w-10 h-20 bg-muted-foreground/25 rounded-t-sm" />
-                        <div className="absolute bottom-12 left-14 w-8 h-28 bg-muted-foreground/20 rounded-t-sm" />
-                        <div className="absolute bottom-12 right-4 w-12 h-24 bg-muted-foreground/22 rounded-t-sm" />
-                        
-                        {/* Trash/Issue indicator */}
-                        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 w-6 h-4 bg-warning/40 rounded-sm border border-warning/60" />
-                        
-                        {/* Scan overlay corners */}
-                        <div className="absolute inset-3 pointer-events-none">
-                          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary rounded-tl-xl" />
-                          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary rounded-tr-xl" />
-                          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary rounded-bl-xl" />
-                          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary rounded-br-xl" />
+                        {/* Grid streets */}
+                        <div className="absolute inset-0">
+                          {/* Horizontal streets */}
+                          <div className="absolute top-[20%] left-0 right-0 h-[3px] bg-white/80 dark:bg-white/20" />
+                          <div className="absolute top-[50%] left-0 right-0 h-[4px] bg-white/90 dark:bg-white/25" />
+                          <div className="absolute top-[75%] left-0 right-0 h-[3px] bg-white/80 dark:bg-white/20" />
+                          
+                          {/* Vertical streets */}
+                          <div className="absolute left-[25%] top-0 bottom-0 w-[3px] bg-white/80 dark:bg-white/20" />
+                          <div className="absolute left-[60%] top-0 bottom-0 w-[4px] bg-white/90 dark:bg-white/25" />
                         </div>
                         
-                        {/* Scanning line animation */}
-                        <div className="absolute left-3 right-3 h-[2px] bg-gradient-to-r from-transparent via-primary/80 to-transparent animate-scan" />
+                        {/* Parks/Green areas */}
+                        <div className="absolute top-[25%] left-[8%] w-8 h-10 bg-primary/30 rounded-lg" />
+                        <div className="absolute bottom-[30%] right-[10%] w-10 h-8 bg-primary/25 rounded-lg" />
                         
-                        {/* AI Detection Box */}
-                        <div className="absolute bottom-16 left-1/2 -translate-x-1/2 px-2 py-1 bg-primary/20 backdrop-blur-sm rounded-lg border border-primary/40">
-                          <p className="text-[7px] text-primary font-medium">Detecting...</p>
-                        </div>
+                        {/* Building blocks */}
+                        <div className="absolute top-[8%] right-[30%] w-6 h-5 bg-muted-foreground/20 rounded-sm" />
+                        <div className="absolute top-[55%] left-[10%] w-7 h-6 bg-muted-foreground/15 rounded-sm" />
+                        <div className="absolute bottom-[12%] left-[35%] w-5 h-4 bg-muted-foreground/20 rounded-sm" />
                         
-                        {/* Center focus indicator */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                          <div className="w-10 h-10 rounded-full border-2 border-primary/50 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        {/* Issue markers */}
+                        <div className="absolute top-[35%] left-[40%] w-3 h-3 bg-warning rounded-full border-2 border-white shadow-sm" />
+                        <div className="absolute top-[60%] right-[25%] w-3 h-3 bg-destructive/80 rounded-full border-2 border-white shadow-sm" />
+                        <div className="absolute bottom-[40%] left-[20%] w-3 h-3 bg-success rounded-full border-2 border-white shadow-sm" />
+                        
+                        {/* Cute cleaning truck */}
+                        <div className="absolute top-[45%] left-[55%] animate-bounce" style={{ animationDuration: '2s' }}>
+                          <div className="relative">
+                            {/* Truck body */}
+                            <div className="w-8 h-5 bg-primary rounded-lg relative">
+                              {/* Cabin */}
+                              <div className="absolute -left-2 top-0.5 w-3 h-4 bg-primary rounded-l-md">
+                                <div className="absolute top-0.5 left-0.5 w-2 h-2 bg-secondary/50 rounded-sm" />
+                              </div>
+                              {/* Brush stripes */}
+                              <div className="absolute right-1 top-1 w-1 h-3 bg-white/40 rounded-full" />
+                              <div className="absolute right-2.5 top-1 w-1 h-3 bg-white/40 rounded-full" />
+                            </div>
+                            {/* Wheels */}
+                            <div className="absolute -bottom-1 left-0 w-2 h-2 bg-foreground/70 rounded-full" />
+                            <div className="absolute -bottom-1 right-1 w-2 h-2 bg-foreground/70 rounded-full" />
+                            {/* Sparkle */}
+                            <div className="absolute -top-2 -right-1 text-[8px]">✨</div>
                           </div>
+                        </div>
+                        
+                        {/* Location label */}
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-white/80 dark:bg-white/10 backdrop-blur-sm rounded-md">
+                          <p className="text-[7px] text-foreground/70 font-medium">Pune City</p>
                         </div>
                       </div>
                       
