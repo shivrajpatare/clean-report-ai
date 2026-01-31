@@ -45,14 +45,15 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
   const fetchReports = async () => {
     setLoading(true);
     try {
+      // Use public_reports view to exclude sensitive PII fields
       const { data, error } = await supabase
-        .from('reports')
+        .from('public_reports')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (error) throw error;
-      setReports(data || []);
+      setReports((data || []) as Report[]);
     } catch (error) {
       console.error('Error fetching reports:', error);
       toast({
@@ -71,13 +72,11 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
 
   const handleFeedback = async (reportId: string, verified: boolean) => {
     try {
-      const { error } = await supabase
-        .from('reports')
-        .update({ 
-          citizen_verified: verified,
-          citizen_feedback: verified ? 'Confirmed resolved' : 'Still not fixed'
-        })
-        .eq('id', reportId);
+      // Use RPC function for citizen feedback (SECURITY DEFINER bypasses RLS)
+      const { error } = await supabase.rpc('submit_report_feedback', {
+        report_id: reportId,
+        verified: verified
+      });
 
       if (error) throw error;
       

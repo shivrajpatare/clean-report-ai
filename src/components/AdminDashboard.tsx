@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, Filter, Download, RefreshCw, ArrowLeft, Sparkles, Flame, Droplets } from "lucide-react";
+import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, Filter, Download, RefreshCw, ArrowLeft, Sparkles, Flame, Droplets, LogIn, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import type { User } from "@supabase/supabase-js";
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -48,19 +50,78 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const [stats, setStats] = useState<Stats>({ total: 0, pending: 0, inProgress: 0, resolved: 0 });
   const [loading, setLoading] = useState(true);
   const [categoryStats, setCategoryStats] = useState<Record<string, number>>({});
+  
+  // Authentication state
+  const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+
+  // Check authentication and admin role
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          // Check if user has admin role
+          const { data: roles } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .single();
+          setIsAdmin(!!roles);
+        } else {
+          setIsAdmin(false);
+        }
+        setAuthLoading(false);
+      });
+
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .eq('role', 'admin')
+          .single();
+        setIsAdmin(!!roles);
+      }
+      setAuthLoading(false);
+
+      return () => subscription.unsubscribe();
+    };
+    checkAuth();
+  }, []);
+
+  const handleSignIn = async () => {
+    setAuthError("");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setAuthError(error.message);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const fetchData = async () => {
+    if (!isAdmin) return;
     setLoading(true);
     try {
-      // Fetch all reports
+      // Use public_reports view for reading (excludes PII)
       const { data: reportsData, error } = await supabase
-        .from('reports')
+        .from('public_reports')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const allReports = reportsData || [];
+      const allReports = (reportsData || []) as Report[];
       setReports(allReports.slice(0, 10)); // Recent 10 for display
 
       // Calculate stats
@@ -92,8 +153,10 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAdmin) {
+      fetchData();
+    }
+  }, [isAdmin]);
 
   const handleUpdateStatus = async (reportId: string, newStatus: string) => {
     try {
@@ -141,6 +204,94 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
 
   const criticalReports = reports.filter(r => r.priority === 'critical' || r.priority === 'high');
 
+  // Show loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-secondary/10 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+      </div>
+    );
+  }
+
+  // Show login form if not authenticated or not admin
+  if (!user || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-secondary/10">
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-drift" />
+          <div className="absolute bottom-20 left-20 w-80 h-80 bg-secondary/5 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-5s" }} />
+        </div>
+        
+        <header className="sticky top-0 z-10 px-4 pt-4">
+          <div className="glass-panel rounded-2xl px-6 py-4">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" onClick={onBack} className="rounded-xl hover:bg-white/10">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="font-medium text-lg text-foreground/90 tracking-wide">Admin Access</h1>
+                <p className="text-xs text-foreground/50 font-light">Authentication Required</p>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="relative px-4 py-12 flex items-center justify-center">
+          <div className="glass-panel rounded-2xl p-8 max-w-md w-full space-y-6">
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-xl font-medium text-foreground/90">Admin Login</h2>
+              <p className="text-sm text-foreground/50 font-light">
+                {user ? "You don't have admin privileges" : "Sign in to access the dashboard"}
+              </p>
+            </div>
+
+            {user ? (
+              <div className="space-y-4">
+                <p className="text-center text-sm text-foreground/60">
+                  Signed in as: {user.email}
+                </p>
+                <Button onClick={handleSignOut} variant="outline" className="w-full rounded-xl">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-xl"
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSignIn()}
+                    className="rounded-xl"
+                  />
+                </div>
+                {authError && (
+                  <p className="text-sm text-destructive text-center">{authError}</p>
+                )}
+                <Button onClick={handleSignIn} className="w-full rounded-xl bg-gradient-to-r from-primary to-secondary">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-secondary/10">
       {/* Ambient background */}
@@ -159,7 +310,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
               </Button>
               <div>
                 <h1 className="font-medium text-lg text-foreground/90 tracking-wide">Admin Dashboard</h1>
-                <p className="text-xs text-foreground/50 font-light">Civic Issue Management</p>
+                <p className="text-xs text-foreground/50 font-light">Signed in as {user.email}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -171,6 +322,15 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
               >
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="rounded-xl hover:bg-white/10 text-foreground/60"
+                onClick={handleSignOut}
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
               </Button>
             </div>
           </div>

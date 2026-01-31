@@ -92,67 +92,117 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_reports: {
         Row: {
           address: string | null
           after_image_url: string | null
+          ai_confidence: number | null
           ai_description: string | null
+          assigned_to: string | null
           before_image_url: string | null
           category: Database["public"]["Enums"]["issue_category"] | null
           citizen_feedback: string | null
           citizen_verified: boolean | null
+          cluster_id: string | null
           created_at: string | null
           id: string | null
+          landmark: string | null
           latitude: number | null
           longitude: number | null
           priority: Database["public"]["Enums"]["priority_level"] | null
+          reporter_count: number | null
           resolved_at: string | null
           status: Database["public"]["Enums"]["report_status"] | null
+          updated_at: string | null
+          ward: string | null
         }
         Insert: {
           address?: string | null
           after_image_url?: string | null
+          ai_confidence?: number | null
           ai_description?: string | null
+          assigned_to?: string | null
           before_image_url?: string | null
           category?: Database["public"]["Enums"]["issue_category"] | null
           citizen_feedback?: string | null
           citizen_verified?: boolean | null
+          cluster_id?: string | null
           created_at?: string | null
           id?: string | null
+          landmark?: string | null
           latitude?: number | null
           longitude?: number | null
           priority?: Database["public"]["Enums"]["priority_level"] | null
+          reporter_count?: number | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["report_status"] | null
+          updated_at?: string | null
+          ward?: string | null
         }
         Update: {
           address?: string | null
           after_image_url?: string | null
+          ai_confidence?: number | null
           ai_description?: string | null
+          assigned_to?: string | null
           before_image_url?: string | null
           category?: Database["public"]["Enums"]["issue_category"] | null
           citizen_feedback?: string | null
           citizen_verified?: boolean | null
+          cluster_id?: string | null
           created_at?: string | null
           id?: string | null
+          landmark?: string | null
           latitude?: number | null
           longitude?: number | null
           priority?: Database["public"]["Enums"]["priority_level"] | null
+          reporter_count?: number | null
           resolved_at?: string | null
           status?: Database["public"]["Enums"]["report_status"] | null
+          updated_at?: string | null
+          ward?: string | null
         }
         Relationships: []
       }
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       submit_report_feedback: {
         Args: { report_id: string; verified: boolean }
         Returns: undefined
       }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       issue_category:
         | "garbage_dump"
         | "dustbin_not_cleaned"
@@ -292,6 +342,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       issue_category: [
         "garbage_dump",
         "dustbin_not_cleaned",
