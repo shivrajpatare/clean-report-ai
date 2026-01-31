@@ -51,11 +51,14 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
         <div className="max-w-3xl mx-auto text-center space-y-12">
           {/* Headline */}
           <div className="space-y-6">
+            <p className="text-lg md:text-xl text-muted-foreground/80 font-light tracking-wide uppercase">
+              Be part of the system your city deserves.
+            </p>
             <h2 className="text-5xl md:text-6xl lg:text-7xl font-light tracking-wide text-foreground/90">
               Begin the Bloom.
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-xl mx-auto">
-              Join the 40,000 citizens currently shaping a cleaner tomorrow.
+              Join <span className="text-primary font-medium">40,000 citizens</span> already restoring their neighborhoods.
             </p>
           </div>
 
