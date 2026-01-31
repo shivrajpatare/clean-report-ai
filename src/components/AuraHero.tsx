@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import cleaningTruck from "@/assets/cleaning-truck.png";
 
 interface AuraHeroProps {
   onStartReport: () => void;
@@ -212,24 +213,12 @@ export const AuraHero = ({ onStartReport }: AuraHeroProps) => {
                         <div className="absolute bottom-[40%] left-[20%] w-3 h-3 bg-success rounded-full border-2 border-white shadow-sm" />
                         
                         {/* Cute cleaning truck */}
-                        <div className="absolute top-[45%] left-[55%] animate-bounce" style={{ animationDuration: '2s' }}>
-                          <div className="relative">
-                            {/* Truck body */}
-                            <div className="w-8 h-5 bg-primary rounded-lg relative">
-                              {/* Cabin */}
-                              <div className="absolute -left-2 top-0.5 w-3 h-4 bg-primary rounded-l-md">
-                                <div className="absolute top-0.5 left-0.5 w-2 h-2 bg-secondary/50 rounded-sm" />
-                              </div>
-                              {/* Brush stripes */}
-                              <div className="absolute right-1 top-1 w-1 h-3 bg-white/40 rounded-full" />
-                              <div className="absolute right-2.5 top-1 w-1 h-3 bg-white/40 rounded-full" />
-                            </div>
-                            {/* Wheels */}
-                            <div className="absolute -bottom-1 left-0 w-2 h-2 bg-foreground/70 rounded-full" />
-                            <div className="absolute -bottom-1 right-1 w-2 h-2 bg-foreground/70 rounded-full" />
-                            {/* Sparkle */}
-                            <div className="absolute -top-2 -right-1 text-[8px]">✨</div>
-                          </div>
+                        <div className="absolute top-[40%] left-[45%] animate-bounce" style={{ animationDuration: '2s' }}>
+                          <img 
+                            src={cleaningTruck} 
+                            alt="Cleaning truck" 
+                            className="w-12 h-10 object-contain drop-shadow-lg"
+                          />
                         </div>
                         
                         {/* Location label */}
