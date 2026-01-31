@@ -124,8 +124,8 @@ export const AuraHero = ({ onStartReport }: AuraHeroProps) => {
           </div>
 
           {/* Phone Mockup */}
-          <div className="relative animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
-            <div className="relative w-[280px] md:w-[320px]">
+          <div className="relative animate-fade-in-up" style={{ animationDelay: '0.5s', perspective: '1000px' }}>
+            <div className="relative w-[280px] md:w-[320px] transition-transform duration-500 ease-out hover:rotate-x-2" style={{ transformStyle: 'preserve-3d' }}>
               {/* Phone Frame */}
               <div className="relative bg-foreground/90 dark:bg-foreground/80 rounded-[3rem] p-3 shadow-2xl">
                 {/* Phone Screen */}

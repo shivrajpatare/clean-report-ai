@@ -345,6 +345,15 @@
   .blur-soft {
     filter: blur(60px);
   }
+  
+  /* 3D Tilt Utilities */
+  .hover\:rotate-y-3:hover {
+    transform: rotateY(3deg);
+  }
+  
+  .hover\:rotate-x-2:hover {
+    transform: rotateX(-2deg) rotateY(3deg) scale(1.02);
+  }
 }
 
 /* Animations */
