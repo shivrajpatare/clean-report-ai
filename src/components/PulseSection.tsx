@@ -278,40 +278,6 @@ export const PulseSection = () => {
             </div>
           </div>
         </div>
-
-        {/* AI Explainer Section */}
-        <div className="mt-12 max-w-4xl mx-auto">
-          <div className="glass-panel rounded-2xl p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h4 className="text-lg font-medium text-foreground">How AI Helps</h4>
-                <p className="text-xs text-muted-foreground">Intelligent automation at every step</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { icon: "🔍", label: "Detects waste type", desc: "Plastic, organic, hazardous" },
-                { icon: "📊", label: "Estimates severity", desc: "Priority scoring 1-10" },
-                { icon: "🎯", label: "Routes to department", desc: "Auto-assignment logic" },
-                { icon: "🗺️", label: "Predicts hotspots", desc: "Pattern recognition" },
-              ].map((item, i) => (
-                <div 
-                  key={i}
-                  className="p-4 rounded-xl bg-muted/30 dark:bg-muted/20 border border-border/30 
-                           hover:border-primary/30 transition-all duration-300 group"
-                >
-                  <span className="text-2xl mb-2 block group-hover:scale-110 transition-transform">{item.icon}</span>
-                  <p className="text-sm font-medium text-foreground mb-1">{item.label}</p>
-                  <p className="text-xs text-muted-foreground">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
