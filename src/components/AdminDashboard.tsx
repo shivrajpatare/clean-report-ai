@@ -58,6 +58,8 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
   // Check authentication and admin role
   useEffect(() => {
@@ -102,6 +104,24 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setAuthError(error.message);
+    }
+  };
+
+  const handleSignUp = async () => {
+    setAuthError("");
+    if (password.length < 6) {
+      setAuthError("Password must be at least 6 characters");
+      return;
+    }
+    const { error } = await supabase.auth.signUp({ 
+      email, 
+      password,
+      options: { emailRedirectTo: window.location.origin }
+    });
+    if (error) {
+      setAuthError(error.message);
+    } else {
+      setSignUpSuccess(true);
     }
   };
 
@@ -242,16 +262,37 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
               <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
                 <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h2 className="text-xl font-medium text-foreground/90">Admin Login</h2>
+              <h2 className="text-xl font-medium text-foreground/90">
+                {isSignUp ? "Create Admin Account" : "Admin Login"}
+              </h2>
               <p className="text-sm text-foreground/50 font-light">
-                {user ? "You don't have admin privileges" : "Sign in to access the dashboard"}
+                {user ? "You don't have admin privileges" : 
+                 signUpSuccess ? "Check your email to confirm your account" :
+                 isSignUp ? "Create an account, then contact admin for access" : 
+                 "Sign in to access the dashboard"}
               </p>
             </div>
 
-            {user ? (
+            {signUpSuccess ? (
+              <div className="space-y-4 text-center">
+                <div className="p-4 rounded-xl bg-success/10 text-success">
+                  ✅ Account created! Check your email to verify, then sign in.
+                </div>
+                <Button 
+                  onClick={() => { setSignUpSuccess(false); setIsSignUp(false); }} 
+                  variant="outline" 
+                  className="w-full rounded-xl"
+                >
+                  Back to Sign In
+                </Button>
+              </div>
+            ) : user ? (
               <div className="space-y-4">
                 <p className="text-center text-sm text-foreground/60">
                   Signed in as: {user.email}
+                </p>
+                <p className="text-center text-xs text-warning">
+                  Your account doesn't have admin privileges yet. Contact an administrator.
                 </p>
                 <Button onClick={handleSignOut} variant="outline" className="w-full rounded-xl">
                   <LogOut className="w-4 h-4 mr-2" />
@@ -270,20 +311,30 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                   />
                   <Input
                     type="password"
-                    placeholder="Password"
+                    placeholder={isSignUp ? "Password (min 6 characters)" : "Password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSignIn()}
+                    onKeyDown={(e) => e.key === 'Enter' && (isSignUp ? handleSignUp() : handleSignIn())}
                     className="rounded-xl"
                   />
                 </div>
                 {authError && (
                   <p className="text-sm text-destructive text-center">{authError}</p>
                 )}
-                <Button onClick={handleSignIn} className="w-full rounded-xl bg-gradient-to-r from-primary to-secondary">
+                <Button 
+                  onClick={isSignUp ? handleSignUp : handleSignIn} 
+                  className="w-full rounded-xl bg-gradient-to-r from-primary to-secondary"
+                >
                   <LogIn className="w-4 h-4 mr-2" />
-                  Sign In
+                  {isSignUp ? "Create Account" : "Sign In"}
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(!isSignUp); setAuthError(""); }}
+                  className="w-full text-sm text-foreground/50 hover:text-foreground/70 transition-colors"
+                >
+                  {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
+                </button>
               </div>
             )}
           </div>
