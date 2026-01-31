@@ -1,16 +1,61 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Camera, X, RotateCcw, Sparkles, MapPin, Upload, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 interface CaptureScreenProps {
-  onCapture: (imageData: string) => void;
+  onCapture: (analysisData: AnalysisResult) => void;
   onClose: () => void;
+}
+
+export interface AnalysisResult {
+  imageUrl: string;
+  category: string;
+  priority: string;
+  confidence: number;
+  description: string;
+  severity_reason: string;
+  latitude: number;
+  longitude: number;
+  address: string;
 }
 
 export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [address, setAddress] = useState<string>("Detecting location...");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Get user's location on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setLocation({ lat: latitude, lng: longitude });
+          
+          // Reverse geocode to get address (using a simple approach)
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
+            const addr = data.display_name?.split(',').slice(0, 3).join(', ') || 'Location detected';
+            setAddress(addr);
+          } catch {
+            setAddress(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+          }
+        },
+        () => {
+          setAddress("Location unavailable");
+          // Default to Pune center
+          setLocation({ lat: 18.5204, lng: 73.8567 });
+        }
+      );
+    }
+  }, []);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -25,14 +70,83 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
   };
 
   const handleSimulateCapture = () => {
+    // For demo, create a placeholder image
     setCapturedImage("captured");
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
+    if (!capturedImage) return;
+    
     setIsAnalyzing(true);
-    setTimeout(() => {
-      onCapture(capturedImage || "simulated");
-    }, 2000);
+    
+    try {
+      let imageUrl = capturedImage;
+      let base64Data = capturedImage;
+
+      // If it's a real image (not simulated), upload to storage
+      if (capturedImage !== "captured" && capturedImage.startsWith('data:')) {
+        // Extract base64 data
+        base64Data = capturedImage;
+        
+        // Upload to storage
+        const fileName = `report_${Date.now()}.jpg`;
+        const base64Content = capturedImage.split(',')[1];
+        const byteCharacters = atob(base64Content);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('report-images')
+          .upload(fileName, blob);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw new Error('Failed to upload image');
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('report-images')
+          .getPublicUrl(fileName);
+        
+        imageUrl = urlData.publicUrl;
+      }
+
+      // Call AI analysis edge function
+      const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-issue', {
+        body: { imageBase64: base64Data }
+      });
+
+      if (analysisError) {
+        console.error('Analysis error:', analysisError);
+        throw new Error('Failed to analyze image');
+      }
+
+      // Pass results to parent
+      onCapture({
+        imageUrl,
+        category: analysisData.category,
+        priority: analysisData.priority,
+        confidence: analysisData.confidence,
+        description: analysisData.description,
+        severity_reason: analysisData.severity_reason,
+        latitude: location?.lat || 18.5204,
+        longitude: location?.lng || 73.8567,
+        address: address,
+      });
+
+    } catch (error) {
+      console.error('Error during analysis:', error);
+      toast({
+        title: "Analysis Failed",
+        description: "Could not analyze the image. Please try again.",
+        variant: "destructive",
+      });
+      setIsAnalyzing(false);
+    }
   };
 
   const handleRetake = () => {
@@ -93,18 +207,18 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <p className="text-xl font-light tracking-wide text-foreground/80">Sensing...</p>
-                    <p className="text-sm text-foreground/50 font-light">Aura is understanding the moment</p>
+                    <p className="text-xl font-light tracking-wide text-foreground/80">AI Analyzing...</p>
+                    <p className="text-sm text-foreground/50 font-light">Detecting issue type & priority</p>
                   </div>
                   <div className="flex flex-wrap gap-3 justify-center">
                     <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in">
-                      Perceiving
+                      🔍 Detecting
                     </span>
                     <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-                      Categorizing
+                      📊 Scoring
                     </span>
                     <span className="px-4 py-2 rounded-full glass-card text-sm text-foreground/60 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-                      Locating
+                      📍 Locating
                     </span>
                   </div>
                 </div>
@@ -124,9 +238,9 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-lg font-light text-foreground/80">Frame the Friction</p>
+                    <p className="text-lg font-light text-foreground/80">Frame the Issue</p>
                     <p className="text-sm text-foreground/50 font-light">
-                      Capture what disrupts the flow
+                      AI will auto-detect category & priority
                     </p>
                   </div>
                 </div>
@@ -140,11 +254,11 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
             </div>
             
             {/* Location Indicator */}
-            <div className="flex items-center gap-3 px-5 py-3 rounded-full glass-card">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+            <div className="flex items-center gap-3 px-5 py-3 rounded-full glass-card max-w-xs">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-4 h-4 text-primary/70" />
               </div>
-              <span className="text-sm text-foreground/60 font-light">Location will flow automatically</span>
+              <span className="text-sm text-foreground/60 font-light truncate">{address}</span>
             </div>
           </div>
         )}
@@ -174,11 +288,11 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                          disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
               >
                 {isAnalyzing ? (
-                  <>Sensing...</>
+                  <>Analyzing...</>
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    Let Aura Sense
+                    AI Analyze
                   </>
                 )}
               </button>
@@ -194,7 +308,7 @@ export const CaptureScreen = ({ onCapture, onClose }: CaptureScreenProps) => {
                          hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Camera className="w-6 h-6" />
-                Capture Moment
+                Capture Photo
               </button>
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />

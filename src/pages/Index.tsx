@@ -6,7 +6,7 @@ import { TransformationSection } from "@/components/TransformationSection";
 import { SymbiosisSection } from "@/components/SymbiosisSection";
 import { FinalCTA } from "@/components/FinalCTA";
 import { AuraFooter } from "@/components/AuraFooter";
-import { CaptureScreen } from "@/components/CaptureScreen";
+import { CaptureScreen, AnalysisResult } from "@/components/CaptureScreen";
 import { AIAnalysisResult } from "@/components/AIAnalysisResult";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { ReportTracking } from "@/components/ReportTracking";
@@ -17,11 +17,20 @@ type Screen = "home" | "capture" | "analysis" | "confirmation" | "tracking" | "a
 
 const Index = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
+  const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
 
   const handleStartReport = () => setCurrentScreen("capture");
-  const handleCapture = () => setCurrentScreen("analysis");
+  
+  const handleCapture = (data: AnalysisResult) => {
+    setAnalysisData(data);
+    setCurrentScreen("analysis");
+  };
+  
   const handleSubmit = () => setCurrentScreen("confirmation");
-  const handleGoHome = () => setCurrentScreen("home");
+  const handleGoHome = () => {
+    setCurrentScreen("home");
+    setAnalysisData(null);
+  };
   const handleTrackReports = () => setCurrentScreen("tracking");
   const handleAdminDashboard = () => setCurrentScreen("admin");
   const handleMapView = () => setCurrentScreen("map");
@@ -31,8 +40,14 @@ const Index = () => {
     return <CaptureScreen onCapture={handleCapture} onClose={handleGoHome} />;
   }
 
-  if (currentScreen === "analysis") {
-    return <AIAnalysisResult onSubmit={handleSubmit} onBack={() => setCurrentScreen("capture")} />;
+  if (currentScreen === "analysis" && analysisData) {
+    return (
+      <AIAnalysisResult 
+        analysisData={analysisData}
+        onSubmit={handleSubmit} 
+        onBack={() => setCurrentScreen("capture")} 
+      />
+    );
   }
 
   if (currentScreen === "confirmation") {
