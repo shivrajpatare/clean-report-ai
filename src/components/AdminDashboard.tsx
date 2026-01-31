@@ -1,8 +1,10 @@
-import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, Filter, Download, RefreshCw, Map } from "lucide-react";
+import { useState } from "react";
+import { BarChart3, Users, CheckCircle, Clock, MapPin, TrendingUp, AlertTriangle, Filter, Download, RefreshCw, Map, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReportsMap } from "@/components/ReportsMap";
+import { NavigationMap } from "@/components/NavigationMap";
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -32,6 +34,19 @@ const wardPerformance = [
 ];
 
 export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
+  const [showNavigation, setShowNavigation] = useState(false);
+
+  // Full-screen navigation mode (like Uber/Ola driver view)
+  if (showNavigation) {
+    return (
+      <div className="h-screen">
+        <NavigationMap 
+          reports={recentReports} 
+          onClose={() => setShowNavigation(false)} 
+        />
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen bg-muted/30">
       {/* Header */}
@@ -45,6 +60,13 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => setShowNavigation(true)}
+              className="gap-2"
+            >
+              <Navigation className="w-4 h-4" />
+              Driver Mode
+            </Button>
             <Button variant="outline" size="sm">
               <RefreshCw className="w-4 h-4" />
               Refresh
