@@ -9,8 +9,9 @@ import { AIAnalysisResult } from "@/components/AIAnalysisResult";
 import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { ReportTracking } from "@/components/ReportTracking";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { IssuesMap } from "@/components/IssuesMap";
 
-type Screen = "home" | "capture" | "analysis" | "confirmation" | "tracking" | "admin";
+type Screen = "home" | "capture" | "analysis" | "confirmation" | "tracking" | "admin" | "map";
 
 const Index = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
@@ -21,6 +22,7 @@ const Index = () => {
   const handleGoHome = () => setCurrentScreen("home");
   const handleTrackReports = () => setCurrentScreen("tracking");
   const handleAdminDashboard = () => setCurrentScreen("admin");
+  const handleMapView = () => setCurrentScreen("map");
 
   // Render overlay screens
   if (currentScreen === "capture") {
@@ -43,10 +45,14 @@ const Index = () => {
     return <AdminDashboard onBack={handleGoHome} />;
   }
 
+  if (currentScreen === "map") {
+    return <IssuesMap onBack={handleGoHome} />;
+  }
+
   // Main landing page
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onTrackReports={handleTrackReports} onAdminDashboard={handleAdminDashboard} />
+      <Navbar onTrackReports={handleTrackReports} onAdminDashboard={handleAdminDashboard} onMapView={handleMapView} />
       <main>
         <HeroSection onStartReport={handleStartReport} />
         <section id="features">

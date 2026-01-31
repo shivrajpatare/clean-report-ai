@@ -1,13 +1,14 @@
-import { Leaf, Menu, X, User, LayoutDashboard } from "lucide-react";
+import { Leaf, Menu, X, User, LayoutDashboard, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 interface NavbarProps {
   onTrackReports: () => void;
   onAdminDashboard: () => void;
+  onMapView: () => void;
 }
 
-export const Navbar = ({ onTrackReports, onAdminDashboard }: NavbarProps) => {
+export const Navbar = ({ onTrackReports, onAdminDashboard, onMapView }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -33,6 +34,10 @@ export const Navbar = ({ onTrackReports, onAdminDashboard }: NavbarProps) => {
             <a href="#impact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
               Our Impact
             </a>
+            <Button variant="ghost" size="sm" onClick={onMapView}>
+              <Map className="w-4 h-4" />
+              Map
+            </Button>
             <Button variant="ghost" size="sm" onClick={onTrackReports}>
               <User className="w-4 h-4" />
               My Reports
@@ -58,6 +63,10 @@ export const Navbar = ({ onTrackReports, onAdminDashboard }: NavbarProps) => {
             <a href="#impact" className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors">
               Our Impact
             </a>
+            <Button variant="ghost" className="w-full justify-start" onClick={() => { onMapView(); setIsOpen(false); }}>
+              <Map className="w-4 h-4" />
+              Issues Map
+            </Button>
             <Button variant="ghost" className="w-full justify-start" onClick={() => { onTrackReports(); setIsOpen(false); }}>
               <User className="w-4 h-4" />
               My Reports
