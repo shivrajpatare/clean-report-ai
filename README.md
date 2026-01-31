@@ -10,7 +10,7 @@ A platform that helps cities detect, prioritize, and resolve urban sanitation is
 
 Aura transforms how cities handle civic complaints by replacing slow, manual reporting systems with an intelligent, photo-based detection platform. Citizens become real-time sensors for urban cleanliness, while authorities gain instant visibility into issues across the city.
 
-The platform combines computer vision, automatic geolocation, and live administrative dashboards to create a responsive civic infrastructure that can identify problems before they escalate.
+The platform combines computer vision powered by Google Gemini, automatic geolocation, and live administrative dashboards to create a responsive civic infrastructure that can identify problems before they escalate.
 
 ---
 
@@ -47,19 +47,33 @@ Aura addresses these challenges through:
 ## Features
 
 ### Intelligent Issue Detection
-The platform analyzes uploaded images to identify issue categories including garbage accumulation, uncleaned dustbins, burning waste, open manholes, stagnant water, sewage overflow, and more. Each detection includes a confidence score.
+The platform analyzes uploaded images using Google Gemini 2.5 Flash to identify issue categories including:
+- Garbage accumulation
+- Uncleaned dustbins
+- Burning waste
+- Open manholes
+- Stagnant water
+- Dead animals
+- Sewage overflow
+- Sweeping not done
+
+Each detection includes a confidence score and severity assessment.
 
 ### Automatic Location Tagging
-GPS coordinates are captured at the moment of reporting and converted to readable addresses. This eliminates manual address entry and ensures precise location data for field teams.
+GPS coordinates are captured at the moment of reporting and converted to readable addresses using reverse geocoding. This eliminates manual address entry and ensures precise location data for field teams.
 
 ### Priority Assessment
 Based on the detected issue type and visual analysis, the system assigns priority levels (Critical, High, Medium, Low) to help authorities allocate resources effectively.
 
 ### Live Administrative Map
-A real-time map displays all reported issues with color-coded markers by status and priority. Administrators can filter, search, and click any marker to view full report details.
+A real-time map displays all reported issues with color-coded markers by status and priority. Administrators can filter, search, and click any marker to view full report details including the original photo.
 
 ### Circular Economy Network
-A dedicated portal connects municipal waste streams with certified processing partners, enabling material recovery tracking from street-level detection to industrial processing.
+A dedicated B2B portal connects municipal waste streams with certified processing partners, featuring:
+- AI-verified material stream analytics
+- Partner integration request system
+- Live recovery stream tracking
+- Circular value metrics
 
 ---
 
@@ -74,7 +88,7 @@ A dedicated portal connects municipal waste streams with certified processing pa
                        v                                   v
               -------------------------------------------------
                             |  Frontend Layer  |
-                            |  React + Tailwind |
+                            |  React + Vite    |
               -------------------------------------------------
                                     |
                                     v
@@ -86,59 +100,240 @@ A dedicated portal connects municipal waste streams with certified processing pa
                     --------------------------------
                     |               |              |
                     v               v              v
-              [AI Analysis]   [Database]    [Storage]
-              [Image Model]   [Reports]     [Images]
+              [Gemini AI]     [PostgreSQL]   [Storage]
+              [Vision API]    [Reports DB]   [Images]
 ```
 
+---
+
+## Tech Stack
+
 ### Frontend
-- React with TypeScript
-- Tailwind CSS for styling
-- Leaflet for interactive maps
-- Framer Motion for animations
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI framework |
+| TypeScript | Type safety |
+| Vite | Build tool and dev server |
+| Tailwind CSS | Utility-first styling |
+| shadcn/ui | Component library |
+| Framer Motion | Animations |
+| Leaflet | Interactive maps |
+| React Query | Server state management |
+| React Hook Form | Form handling |
+| Zod | Schema validation |
 
 ### Backend
-- Serverless edge functions
-- RESTful API design
-- Real-time data subscriptions
+| Technology | Purpose |
+|------------|---------|
+| Lovable Cloud | Serverless infrastructure |
+| PostgreSQL | Database |
+| Edge Functions | API endpoints |
+| Row Level Security | Data protection |
 
-### Database
-- PostgreSQL with row-level security
-- Structured tables for reports, users, and assignments
-- Geospatial queries for location-based filtering
+### AI
+| Technology | Purpose |
+|------------|---------|
+| Google Gemini 2.5 Flash | Image analysis and classification |
+| Lovable AI Gateway | API management |
 
-### AI Processing
-- Computer vision for waste and issue detection
-- Category classification across nine issue types
-- Confidence scoring for quality assessment
+### Maps
+| Technology | Purpose |
+|------------|---------|
+| Leaflet | Map rendering |
+| OpenStreetMap | Tile provider |
+| Marker Clustering | Performance optimization |
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── admin/           # Admin dashboard components
+│   │   ├── AdminMapPanel.tsx
+│   │   └── ReportDetailPanel.tsx
+│   ├── map/             # Map utilities
+│   │   └── mapUtils.ts
+│   ├── ui/              # shadcn/ui components
+│   ├── AuraNavbar.tsx   # Navigation
+│   ├── AuraHero.tsx     # Landing hero
+│   ├── CaptureScreen.tsx # Photo capture
+│   ├── AIAnalysisResult.tsx
+│   ├── AdminDashboard.tsx
+│   ├── IssuesMap.tsx
+│   └── ...
+├── pages/
+│   ├── Index.tsx        # Main landing page
+│   ├── CircularNetwork.tsx # B2B partner portal
+│   └── NotFound.tsx
+├── hooks/               # Custom React hooks
+├── integrations/
+│   └── supabase/        # Database client and types
+├── lib/                 # Utilities
+└── test/                # Test setup
+supabase/
+├── functions/
+│   └── analyze-issue/   # AI analysis edge function
+└── config.toml
+```
 
 ---
 
 ## Key Screens
 
 ### Citizen Reporting Interface
-A camera-first design guides users through capturing clear photos. The interface provides real-time AI feedback, automatic location detection, and a streamlined submission flow.
+A camera-first design with:
+- Real-time AI status feedback
+- Flash toggle and gallery upload
+- Automatic location detection
+- Community motivation messages
+- Privacy reassurance
 
 ### Administrative Dashboard
-A command center view combining statistics, a filterable report list, and an interactive map. Administrators can review details, assign teams, and update statuses from a single screen.
+A command center featuring:
+- Live statistics cards
+- Filterable report list
+- Interactive map panel
+- Report detail slide-out
+- Status management controls
 
 ### City Issues Map
-A public-facing map showing the current state of reported issues across the city. Markers indicate status (Pending, In Progress, Resolved) and cluster automatically at lower zoom levels.
+Public-facing map showing:
+- All reported issues across Pune
+- Status-based color coding
+- Marker clustering for performance
+- Filter by status
+- Click-to-view details
 
-### Partner Integration Portal
-A B2B interface for waste processing partners to view available material streams, request allocations, and track circular economy metrics.
+### Circular Economy Portal
+B2B interface displaying:
+- System health metrics
+- Material stream analytics
+- Partner integration form
+- Available recovery streams
+- AI purity scores
+
+---
+
+## Database Schema
+
+### Reports Table
+| Column | Type | Description |
+|--------|------|-------------|
+| id | UUID | Primary key |
+| category | ENUM | Issue type |
+| priority | ENUM | Severity level |
+| status | ENUM | Current status |
+| latitude | FLOAT | GPS latitude |
+| longitude | FLOAT | GPS longitude |
+| address | TEXT | Reverse geocoded address |
+| before_image_url | TEXT | Original photo URL |
+| ai_description | TEXT | AI-generated description |
+| ai_confidence | FLOAT | Detection confidence |
+| created_at | TIMESTAMP | Report time |
+
+### Issue Categories
+- garbage_dump
+- dustbin_not_cleaned
+- burning_garbage
+- open_manhole
+- stagnant_water
+- dead_animal
+- sewage_overflow
+- sweeping_not_done
+- other
+
+### Priority Levels
+- critical
+- high
+- medium
+- low
+
+### Report Statuses
+- pending
+- in_progress
+- resolved
+- duplicate
 
 ---
 
 ## Workflow
 
-1. A citizen notices a civic issue such as garbage dumping
-2. They open Aura and capture a photo through the camera interface
-3. The AI analyzes the image and identifies the issue category
-4. Location coordinates are automatically attached to the report
-5. The report appears on the administrative dashboard
-6. An administrator reviews and assigns the report to a field team
-7. The team addresses the issue and updates the status
-8. The citizen can track progress and verify resolution
+1. Citizen spots a civic issue
+2. Opens Aura and captures a photo through the camera interface
+3. AI analyzes the image using Gemini Vision
+4. Issue category, severity, and description are generated
+5. Location coordinates are automatically attached
+6. Report is stored in the database with image in cloud storage
+7. Admin sees the issue appear on the live dashboard map
+8. Admin reviews details and assigns to field team
+9. Team addresses the issue and updates status
+10. Citizen can track progress through the map view
+
+---
+
+## Installation
+
+### Prerequisites
+- Node.js 18 or higher
+- npm or bun
+
+### Setup
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd aura
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+### Environment Variables
+
+The project uses Lovable Cloud which automatically configures:
+- `VITE_SUPABASE_URL` - Database endpoint
+- `VITE_SUPABASE_PUBLISHABLE_KEY` - API key
+- `VITE_SUPABASE_PROJECT_ID` - Project identifier
+
+### Running Tests
+
+```bash
+npm run test
+```
+
+---
+
+## API Reference
+
+### Edge Functions
+
+**POST /analyze-issue**
+
+Analyzes an uploaded image for civic issues.
+
+Request:
+```json
+{
+  "imageBase64": "base64-encoded-image-data"
+}
+```
+
+Response:
+```json
+{
+  "category": "garbage_dump",
+  "priority": "high",
+  "description": "Large pile of mixed waste including plastic bags...",
+  "confidence": 0.92
+}
+```
 
 ---
 
@@ -180,41 +375,6 @@ Transparent status tracking builds trust between citizens and municipal bodies.
 
 ---
 
-## Technology
-
-| Layer | Technologies |
-|-------|-------------|
-| Frontend | React, TypeScript, Tailwind CSS, Framer Motion, Leaflet |
-| Backend | Edge Functions, PostgreSQL, Real-time Subscriptions |
-| AI | Computer Vision Models, Image Classification |
-| Infrastructure | Cloud-hosted, Serverless Architecture |
-
----
-
-## Installation
-
-### Frontend
-
-```bash
-git clone <repository-url>
-cd aura
-npm install
-npm run dev
-```
-
-The development server will start at `http://localhost:5173`
-
-### Environment Variables
-
-Create a `.env` file with the required configuration:
-
-```
-VITE_SUPABASE_URL=<your-database-url>
-VITE_SUPABASE_PUBLISHABLE_KEY=<your-api-key>
-```
-
----
-
 ## Collaboration
 
 Aura welcomes partnerships with:
@@ -225,7 +385,7 @@ Aura welcomes partnerships with:
 - NGOs and civic organizations focused on urban cleanliness
 - Technology partners with complementary solutions
 
-For partnership inquiries, use the Partner Integration Request form on the platform.
+For partnership inquiries, visit the Circular Economy Network portal at `/partners`.
 
 ---
 
