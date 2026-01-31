@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Map, User, LayoutDashboard, Compass, Sparkles } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface AuraNavbarProps {
   onTrackReports: () => void;
@@ -25,8 +26,8 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
       <div
         className={`transition-all duration-500 ease-out ${
           isScrolled
-            ? "w-full max-w-4xl bg-white/70 backdrop-blur-2xl border border-white/50 shadow-soft rounded-2xl px-6"
-            : "bg-foreground/80 backdrop-blur-2xl border border-white/10 shadow-lg rounded-full px-4"
+            ? "w-full max-w-4xl bg-white/70 dark:bg-white/5 backdrop-blur-2xl border border-white/50 dark:border-white/10 shadow-soft rounded-2xl px-6"
+            : "bg-foreground/80 dark:bg-white/10 backdrop-blur-2xl border border-white/10 shadow-lg rounded-full px-4"
         }`}
       >
         <div className={`flex items-center justify-center gap-1 transition-all duration-500 ${
@@ -65,6 +66,10 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
               <DockIcon onClick={onAdminDashboard} label="Admin">
                 <LayoutDashboard className="w-5 h-5 text-white/80" />
               </DockIcon>
+              
+              <div className="w-px h-6 bg-white/20 mx-1" />
+              
+              <ThemeToggle variant="dock" />
             </>
           ) : (
             /* Expanded mode - full navigation */
@@ -109,6 +114,7 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
                   <LayoutDashboard className="w-4 h-4" />
                   Admin
                 </button>
+                <ThemeToggle />
               </div>
 
               {/* Mobile Menu Button */}
