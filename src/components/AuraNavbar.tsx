@@ -59,12 +59,8 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
                 <Map className="w-5 h-5 text-white/80" />
               </DockIcon>
               
-              <DockIcon onClick={onTrackReports} label="Track">
+              <DockIcon onClick={onTrackReports} label="Track My Report">
                 <User className="w-5 h-5 text-white/80" />
-              </DockIcon>
-              
-              <DockIcon onClick={onAdminDashboard} label="Admin">
-                <LayoutDashboard className="w-5 h-5 text-white/80" />
               </DockIcon>
               
               <div className="w-px h-6 bg-white/20 mx-1" />
@@ -103,18 +99,15 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
                   className="text-muted-foreground hover:text-foreground font-light transition-colors duration-300 flex items-center gap-1.5"
                 >
                   <User className="w-4 h-4" />
-                  Track
-                </button>
-                <button
-                  onClick={onAdminDashboard}
-                  className="px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 
-                           text-foreground/80 font-medium transition-all duration-300
-                           hover:from-primary/20 hover:to-secondary/20 flex items-center gap-1.5"
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Admin
+                  Track My Report
                 </button>
                 <ThemeToggle />
+                <button
+                  onClick={onAdminDashboard}
+                  className="text-xs text-muted-foreground/70 hover:text-foreground font-light transition-colors duration-300"
+                >
+                  City Login
+                </button>
               </div>
 
               {/* Mobile Menu Button */}
@@ -151,15 +144,16 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
               onClick={() => { onTrackReports(); setIsMobileMenuOpen(false); }}
               className="flex items-center gap-2 w-full py-2 text-foreground/80 font-light"
             >
-              <User className="w-4 h-4" /> Track Reports
+              <User className="w-4 h-4" /> Track My Report
             </button>
-            <button
-              onClick={() => { onAdminDashboard(); setIsMobileMenuOpen(false); }}
-              className="flex items-center gap-2 w-full py-3 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 
-                       text-foreground/80 font-medium justify-center mt-2"
-            >
-              <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
-            </button>
+            <div className="pt-4 mt-2 border-t border-muted/30">
+              <button
+                onClick={() => { onAdminDashboard(); setIsMobileMenuOpen(false); }}
+                className="text-xs text-muted-foreground/70 hover:text-foreground font-light transition-colors"
+              >
+                City Login →
+              </button>
+            </div>
           </div>
         )}
       </div>
