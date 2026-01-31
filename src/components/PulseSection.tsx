@@ -1,5 +1,5 @@
-import { Eye, Sparkles, Heart, Leaf, ArrowRight, Camera } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Eye, Heart, Leaf, ArrowRight, Camera } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 /* Visual Cue Components */
 const WitnessVisual = () => (
@@ -118,6 +118,36 @@ const TransformVisual = () => {
 const visualComponents = [WitnessVisual, CaptureVisual, ConnectVisual, TransformVisual];
 
 export const PulseSection = () => {
+  const [visibleCards, setVisibleCards] = useState<boolean[]>([false, false, false, false]);
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observers = cardsRef.current.map((card, index) => {
+      if (!card) return null;
+      
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisibleCards(prev => {
+              const newState = [...prev];
+              newState[index] = true;
+              return newState;
+            });
+            observer.unobserve(card);
+          }
+        },
+        { threshold: 0.2, rootMargin: "0px 0px -50px 0px" }
+      );
+      
+      observer.observe(card);
+      return observer;
+    });
+
+    return () => {
+      observers.forEach(observer => observer?.disconnect());
+    };
+  }, []);
+
   const journey = [
     {
       icon: Eye,
@@ -190,8 +220,13 @@ export const PulseSection = () => {
               return (
                 <div
                   key={index}
-                  className="group relative animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.15}s` }}
+                  ref={(el) => { cardsRef.current[index] = el; }}
+                  className={`group relative transition-all duration-700 ease-out ${
+                    visibleCards[index] 
+                      ? 'opacity-100 translate-y-0' 
+                      : 'opacity-0 translate-y-8'
+                  }`}
+                  style={{ transitionDelay: `${index * 150}ms` }}
                 >
                   {/* Card */}
                   <div className="glass-panel p-8 h-full transition-all duration-500 hover:shadow-glow group-hover:-translate-y-2">
