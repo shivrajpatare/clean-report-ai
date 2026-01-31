@@ -94,10 +94,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_reports: {
+        Row: {
+          address: string | null
+          after_image_url: string | null
+          ai_description: string | null
+          before_image_url: string | null
+          category: Database["public"]["Enums"]["issue_category"] | null
+          citizen_feedback: string | null
+          citizen_verified: boolean | null
+          created_at: string | null
+          id: string | null
+          latitude: number | null
+          longitude: number | null
+          priority: Database["public"]["Enums"]["priority_level"] | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["report_status"] | null
+        }
+        Insert: {
+          address?: string | null
+          after_image_url?: string | null
+          ai_description?: string | null
+          before_image_url?: string | null
+          category?: Database["public"]["Enums"]["issue_category"] | null
+          citizen_feedback?: string | null
+          citizen_verified?: boolean | null
+          created_at?: string | null
+          id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"] | null
+        }
+        Update: {
+          address?: string | null
+          after_image_url?: string | null
+          ai_description?: string | null
+          before_image_url?: string | null
+          category?: Database["public"]["Enums"]["issue_category"] | null
+          citizen_feedback?: string | null
+          citizen_verified?: boolean | null
+          created_at?: string | null
+          id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          priority?: Database["public"]["Enums"]["priority_level"] | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"] | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      submit_report_feedback: {
+        Args: { report_id: string; verified: boolean }
+        Returns: undefined
+      }
     }
     Enums: {
       issue_category:
