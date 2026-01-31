@@ -9,8 +9,8 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
 
   return (
     <section className="relative py-40 overflow-hidden bg-background">
-      {/* Twilight gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 dark:via-secondary/5 to-accent/20 dark:to-accent/10" />
+      {/* Twilight gradient background with motion */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 dark:via-secondary/5 to-accent/20 dark:to-accent/10 animate-gradient-shift" />
       
       {/* Ocean-like wave effect */}
       <div className="absolute inset-0">
