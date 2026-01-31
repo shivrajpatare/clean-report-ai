@@ -14,7 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      reports: {
+        Row: {
+          address: string | null
+          after_image_url: string | null
+          ai_confidence: number | null
+          ai_description: string | null
+          assigned_to: string | null
+          before_image_url: string
+          category: Database["public"]["Enums"]["issue_category"]
+          citizen_feedback: string | null
+          citizen_verified: boolean | null
+          cluster_id: string | null
+          created_at: string
+          id: string
+          landmark: string | null
+          latitude: number
+          longitude: number
+          priority: Database["public"]["Enums"]["priority_level"]
+          reporter_count: number | null
+          reporter_name: string | null
+          reporter_phone: string | null
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["report_status"]
+          updated_at: string
+          ward: string | null
+        }
+        Insert: {
+          address?: string | null
+          after_image_url?: string | null
+          ai_confidence?: number | null
+          ai_description?: string | null
+          assigned_to?: string | null
+          before_image_url: string
+          category?: Database["public"]["Enums"]["issue_category"]
+          citizen_feedback?: string | null
+          citizen_verified?: boolean | null
+          cluster_id?: string | null
+          created_at?: string
+          id?: string
+          landmark?: string | null
+          latitude: number
+          longitude: number
+          priority?: Database["public"]["Enums"]["priority_level"]
+          reporter_count?: number | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          updated_at?: string
+          ward?: string | null
+        }
+        Update: {
+          address?: string | null
+          after_image_url?: string | null
+          ai_confidence?: number | null
+          ai_description?: string | null
+          assigned_to?: string | null
+          before_image_url?: string
+          category?: Database["public"]["Enums"]["issue_category"]
+          citizen_feedback?: string | null
+          citizen_verified?: boolean | null
+          cluster_id?: string | null
+          created_at?: string
+          id?: string
+          landmark?: string | null
+          latitude?: number
+          longitude?: number
+          priority?: Database["public"]["Enums"]["priority_level"]
+          reporter_count?: number | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["report_status"]
+          updated_at?: string
+          ward?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +100,18 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      issue_category:
+        | "garbage_dump"
+        | "dustbin_not_cleaned"
+        | "burning_garbage"
+        | "open_manhole"
+        | "stagnant_water"
+        | "dead_animal"
+        | "sewage_overflow"
+        | "sweeping_not_done"
+        | "other"
+      priority_level: "low" | "medium" | "high" | "critical"
+      report_status: "pending" | "in_progress" | "resolved" | "duplicate"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +238,20 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      issue_category: [
+        "garbage_dump",
+        "dustbin_not_cleaned",
+        "burning_garbage",
+        "open_manhole",
+        "stagnant_water",
+        "dead_animal",
+        "sewage_overflow",
+        "sweeping_not_done",
+        "other",
+      ],
+      priority_level: ["low", "medium", "high", "critical"],
+      report_status: ["pending", "in_progress", "resolved", "duplicate"],
+    },
   },
 } as const
