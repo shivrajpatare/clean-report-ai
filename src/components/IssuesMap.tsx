@@ -1,39 +1,29 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, MapPin, Filter, Layers, Sparkles } from "lucide-react";
+import { ArrowLeft, MapPin, Filter, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
+import {
+  createStatusIcon,
+  createClusterIcon,
+  PUNE_CENTER,
+  DEFAULT_ZOOM,
+  TILE_LAYER_URL,
+  TILE_LAYER_ATTRIBUTION,
+  mapStyles,
+} from "@/components/map/mapUtils";
 
 interface IssuesMapProps {
   onBack: () => void;
 }
 
-// Custom marker icons with organic styling
-const createCustomIcon = (color: string, glowColor: string) => {
-  return L.divIcon({
-    className: "custom-marker",
-    html: `<div style="
-      background: linear-gradient(135deg, ${color}, ${glowColor});
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.9);
-      box-shadow: 0 4px 20px ${color}40, 0 0 30px ${color}20;
-      animation: breath 3s ease-in-out infinite;
-    "></div>`,
-    iconSize: [28, 28],
-    iconAnchor: [14, 14],
-    popupAnchor: [0, -14],
-  });
-};
-
 const statusIcons = {
-  pending: createCustomIcon("hsl(38, 92%, 50%)", "hsl(25, 95%, 53%)"),
-  progress: createCustomIcon("hsl(199, 89%, 48%)", "hsl(217, 91%, 60%)"),
-  resolved: createCustomIcon("hsl(152, 76%, 36%)", "hsl(160, 84%, 39%)"),
+  pending: createStatusIcon("pending"),
+  progress: createStatusIcon("in_progress"),
+  resolved: createStatusIcon("resolved"),
 };
 
 // Mock data - Pune area reports
@@ -75,11 +65,10 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = L.map(mapContainerRef.current).setView([18.5204, 73.8567], 12);
+    const map = L.map(mapContainerRef.current).setView(PUNE_CENTER, DEFAULT_ZOOM);
     
-    // Use a softer, more ethereal map style
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    L.tileLayer(TILE_LAYER_URL, {
+      attribution: TILE_LAYER_ATTRIBUTION,
     }).addTo(map);
 
     mapRef.current = map;
@@ -100,32 +89,7 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
 
     const markers = L.markerClusterGroup({
       chunkedLoading: true,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        let size = 44;
-        if (count > 10) size = 54;
-        if (count > 25) size = 64;
-        
-        return L.divIcon({
-          html: `<div style="
-            background: linear-gradient(135deg, hsl(152, 76%, 36%), hsl(199, 89%, 48%));
-            width: ${size}px;
-            height: ${size}px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 400;
-            font-size: ${size / 2.5}px;
-            border: 3px solid rgba(255,255,255,0.9);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 0 40px hsl(152, 76%, 36%, 0.2);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-          ">${count}</div>`,
-          className: "custom-cluster-icon",
-          iconSize: L.point(size, size),
-        });
-      },
+      iconCreateFunction: (cluster) => createClusterIcon(cluster.getChildCount()),
     });
 
     filteredReports.forEach((report) => {
@@ -267,22 +231,7 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
       </div>
 
       {/* Custom popup styles */}
-      <style>{`
-        .aura-popup .leaflet-popup-content-wrapper {
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(20px);
-          border-radius: 16px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-          border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        .aura-popup .leaflet-popup-tip {
-          background: rgba(255, 255, 255, 0.95);
-        }
-        @keyframes breath {
-          0%, 100% { transform: scale(1); opacity: 0.9; }
-          50% { transform: scale(1.05); opacity: 1; }
-        }
-      `}</style>
+      <style>{mapStyles}</style>
     </div>
   );
 };

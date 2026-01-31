@@ -7,6 +7,16 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
+import {
+  createPriorityIcon,
+  selectedMarkerIcon,
+  createClusterIcon,
+  PUNE_CENTER,
+  DEFAULT_ZOOM,
+  TILE_LAYER_URL,
+  TILE_LAYER_ATTRIBUTION,
+  mapStyles,
+} from "@/components/map/mapUtils";
 
 export interface MapReport {
   id: string;
@@ -28,51 +38,6 @@ interface AdminMapPanelProps {
   showHighPriorityOnly: boolean;
   onToggleHighPriority: (value: boolean) => void;
 }
-
-// Custom marker icons with priority-based colors
-const createPriorityIcon = (priority: string) => {
-  const colors = {
-    critical: { bg: "hsl(0, 84%, 60%)", glow: "hsl(0, 84%, 50%)" },
-    high: { bg: "hsl(0, 84%, 60%)", glow: "hsl(0, 84%, 50%)" },
-    medium: { bg: "hsl(38, 92%, 50%)", glow: "hsl(25, 95%, 53%)" },
-    low: { bg: "hsl(48, 96%, 53%)", glow: "hsl(45, 93%, 47%)" },
-  };
-
-  const color = colors[priority as keyof typeof colors] || colors.low;
-
-  return L.divIcon({
-    className: "custom-admin-marker",
-    html: `<div style="
-      background: linear-gradient(135deg, ${color.bg}, ${color.glow});
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.95);
-      box-shadow: 0 4px 20px ${color.bg}60, 0 0 30px ${color.bg}30;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    "></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -12],
-  });
-};
-
-const selectedIcon = L.divIcon({
-  className: "custom-admin-marker-selected",
-  html: `<div style="
-    background: linear-gradient(135deg, hsl(152, 76%, 36%), hsl(199, 89%, 48%));
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 4px solid white;
-    box-shadow: 0 4px 30px hsl(152, 76%, 36%, 0.6), 0 0 50px hsl(152, 76%, 36%, 0.4);
-    animation: pulse-selected 1.5s ease-in-out infinite;
-  "></div>`,
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  popupAnchor: [0, -16],
-});
 
 export const AdminMapPanel = ({
   reports,
@@ -97,14 +62,13 @@ export const AdminMapPanel = ({
 
     const map = L.map(mapContainerRef.current, {
       zoomControl: false,
-    }).setView([18.5204, 73.8567], 12);
+    }).setView(PUNE_CENTER, DEFAULT_ZOOM);
 
-    // Add zoom control to bottom right
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Use dark mode tile layer for control room feel
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
+    // Use same light tile layer as public map for consistency
+    L.tileLayer(TILE_LAYER_URL, {
+      attribution: TILE_LAYER_ATTRIBUTION,
     }).addTo(map);
 
     mapRef.current = map;
@@ -119,7 +83,6 @@ export const AdminMapPanel = ({
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Clear existing markers
     if (markersRef.current) {
       mapRef.current.removeLayer(markersRef.current);
     }
@@ -127,30 +90,7 @@ export const AdminMapPanel = ({
 
     const clusterGroup = L.markerClusterGroup({
       chunkedLoading: true,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        const size = count > 20 ? 56 : count > 10 ? 48 : 40;
-
-        return L.divIcon({
-          html: `<div style="
-            background: linear-gradient(135deg, hsl(0, 0%, 20%), hsl(0, 0%, 30%));
-            width: ${size}px;
-            height: ${size}px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 500;
-            font-size: ${size / 2.8}px;
-            border: 3px solid rgba(255,255,255,0.3);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-          ">${count}</div>`,
-          className: "custom-cluster-admin",
-          iconSize: L.point(size, size),
-        });
-      },
+      iconCreateFunction: (cluster) => createClusterIcon(cluster.getChildCount()),
     });
 
     displayReports.forEach((report) => {
@@ -158,7 +98,7 @@ export const AdminMapPanel = ({
 
       const isSelected = report.id === selectedReportId;
       const marker = L.marker([report.latitude, report.longitude], {
-        icon: isSelected ? selectedIcon : createPriorityIcon(report.priority),
+        icon: isSelected ? selectedMarkerIcon : createPriorityIcon(report.priority),
       });
 
       marker.on('click', () => onSelectReport(report));
@@ -180,10 +120,9 @@ export const AdminMapPanel = ({
         duration: 0.8,
       });
 
-      // Update marker icon to selected state
       const marker = markerMapRef.current.get(selectedReportId);
       if (marker) {
-        marker.setIcon(selectedIcon);
+        marker.setIcon(selectedMarkerIcon);
       }
     }
   }, [selectedReportId, reports]);
@@ -259,15 +198,7 @@ export const AdminMapPanel = ({
       </div>
 
       {/* Custom styles */}
-      <style>{`
-        @keyframes pulse-selected {
-          0%, 100% { transform: scale(1); box-shadow: 0 4px 30px hsl(152, 76%, 36%, 0.6); }
-          50% { transform: scale(1.1); box-shadow: 0 4px 40px hsl(152, 76%, 36%, 0.8); }
-        }
-        .leaflet-container {
-          background: hsl(222, 47%, 11%);
-        }
-      `}</style>
+      <style>{mapStyles}</style>
     </div>
   );
 };
