@@ -62,7 +62,7 @@ export const AuraFooter = () => {
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-light">
+                  <a href="/partners" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-light">
                     Partner with Us
                   </a>
                 </li>
