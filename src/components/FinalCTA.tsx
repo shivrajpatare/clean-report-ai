@@ -1,4 +1,5 @@
 import { useState } from "react";
+import auraLeafIcon from "@/assets/aura-leaf-icon.png";
 
 interface FinalCTAProps {
   onStartReport: () => void;
@@ -81,11 +82,13 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
               }}
             >
               <span className="relative z-10 flex items-center gap-4">
-                <span 
-                  className="w-3 h-3 rounded-full bg-white transition-all duration-500"
+                <img 
+                  src={auraLeafIcon}
+                  alt="Aura"
+                  className="w-6 h-6 transition-all duration-500"
                   style={{
-                    transform: isHovered ? 'scale(1.5)' : 'scale(1)',
-                    boxShadow: isHovered ? '0 0 20px white' : 'none',
+                    transform: isHovered ? 'scale(1.2)' : 'scale(1)',
+                    filter: isHovered ? 'drop-shadow(0 0 12px rgba(255,255,255,0.8))' : 'none',
                   }}
                 />
                 Download the Aura Mirror
