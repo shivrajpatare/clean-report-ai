@@ -23,14 +23,14 @@ export const PulseSection = () => {
   ];
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section id="pulse" className="relative py-32 overflow-hidden bg-background">
       {/* Subtle background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 dark:via-muted/10 to-background" />
       
       {/* Central Orb */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px]">
         <div className="absolute inset-0 rounded-full gradient-orb animate-pulse-glow" />
-        <div className="absolute inset-12 rounded-full bg-white/40 backdrop-blur-3xl border border-white/30" />
+        <div className="absolute inset-12 rounded-full bg-card/60 dark:bg-card/40 backdrop-blur-3xl border border-border/50" />
         <div className="absolute inset-24 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 animate-breath" />
       </div>
 
@@ -80,7 +80,7 @@ export const PulseSection = () => {
                 {/* Icon */}
                 <div className="relative w-20 h-20 mx-auto mb-6">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 animate-breath" />
-                  <div className="absolute inset-2 rounded-full bg-white/80 backdrop-blur flex items-center justify-center">
+                  <div className="absolute inset-2 rounded-full bg-card/90 dark:bg-card/70 backdrop-blur flex items-center justify-center border border-border/30">
                     <step.icon className="w-8 h-8 text-primary" />
                   </div>
                 </div>

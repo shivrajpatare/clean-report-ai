@@ -22,11 +22,11 @@ export const TransformationSection = () => {
   };
 
   return (
-    <section className="relative py-32 overflow-hidden bg-muted/20">
+    <section className="relative py-32 overflow-hidden bg-muted/20 dark:bg-muted/5">
       {/* Background elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 right-20 w-80 h-80 rounded-full bg-primary/5 blur-ethereal animate-float" />
-        <div className="absolute bottom-20 left-20 w-60 h-60 rounded-full bg-secondary/5 blur-soft animate-drift" />
+        <div className="absolute top-20 right-20 w-80 h-80 rounded-full bg-primary/10 dark:bg-primary/20 blur-ethereal animate-float" />
+        <div className="absolute bottom-20 left-20 w-60 h-60 rounded-full bg-secondary/10 dark:bg-secondary/20 blur-soft animate-drift" />
       </div>
 
       <div className="container relative z-10">
@@ -91,15 +91,15 @@ export const TransformationSection = () => {
 
             {/* Liquid Brush Divider */}
             <div
-              className="absolute top-0 bottom-0 w-1 bg-gradient-to-b from-white via-primary to-secondary"
+              className="absolute top-0 bottom-0 w-1 bg-gradient-to-b from-primary-foreground dark:from-foreground via-primary to-secondary"
               style={{ 
                 left: `${sliderPosition}%`, 
                 transform: 'translateX(-50%)',
-                boxShadow: '0 0 30px rgba(255,255,255,0.8), 0 0 60px hsl(var(--primary) / 0.5)'
+                boxShadow: '0 0 30px hsl(var(--primary) / 0.5), 0 0 60px hsl(var(--primary) / 0.3)'
               }}
             >
               {/* Handle */}
-              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-white shadow-glow flex items-center justify-center">
+              <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-card dark:bg-card shadow-glow flex items-center justify-center border border-border/50">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary animate-pulse" />
               </div>
             </div>

@@ -1,8 +1,8 @@
 export const AuraFooter = () => {
   return (
-    <footer className="relative py-16 overflow-hidden">
+    <footer className="relative py-16 overflow-hidden bg-background">
       {/* Subtle gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-muted/50 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-muted/30 dark:from-muted/10 to-transparent" />
 
       <div className="container relative z-10">
         <div className="max-w-4xl mx-auto">
@@ -13,7 +13,7 @@ export const AuraFooter = () => {
               <div className="flex items-center gap-3">
                 <div className="relative w-8 h-8">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-secondary opacity-80" />
-                  <div className="absolute inset-1 rounded-full bg-white/90 flex items-center justify-center">
+                  <div className="absolute inset-1 rounded-full bg-card/90 dark:bg-card/80 flex items-center justify-center border border-border/30">
                     <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary to-secondary" />
                   </div>
                 </div>

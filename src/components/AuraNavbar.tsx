@@ -78,7 +78,7 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
               <a href="/" className="flex items-center gap-2">
                 <div className="relative w-8 h-8">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-secondary opacity-80" />
-                  <div className="absolute inset-1 rounded-full bg-white/90 flex items-center justify-center">
+                  <div className="absolute inset-1 rounded-full bg-card/90 dark:bg-card/80 flex items-center justify-center border border-border/30">
                     <div className="w-3 h-3 rounded-full bg-gradient-to-br from-primary to-secondary animate-breath" />
                   </div>
                 </div>

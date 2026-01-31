@@ -24,22 +24,22 @@ export const AuraHero = ({
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
-  return <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+  return <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
       {/* Background - Ethereal Gradient */}
-      <div className="absolute inset-0 gradient-ethereal" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10" />
       
       {/* Animated Orbs */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-[600px] h-[600px] rounded-full bg-primary/20 blur-ethereal animate-drift" style={{
+        <div className="absolute w-[600px] h-[600px] rounded-full bg-primary/20 dark:bg-primary/30 blur-ethereal animate-drift" style={{
         top: '10%',
         left: '10%'
       }} />
-        <div className="absolute w-[500px] h-[500px] rounded-full bg-secondary/20 blur-ethereal animate-float" style={{
+        <div className="absolute w-[500px] h-[500px] rounded-full bg-secondary/20 dark:bg-secondary/30 blur-ethereal animate-float" style={{
         bottom: '10%',
         right: '10%',
         animationDelay: '-2s'
       }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full bg-primary/15 blur-soft animate-breath" style={{
+        <div className="absolute w-[400px] h-[400px] rounded-full bg-primary/15 dark:bg-primary/25 blur-soft animate-breath" style={{
         top: '50%',
         left: '50%',
         transform: 'translate(-50%, -50%)'
@@ -50,7 +50,7 @@ export const AuraHero = ({
       <div className="absolute w-80 h-80 rounded-full pointer-events-none transition-all duration-700 ease-out" style={{
       left: mousePos.x - 160,
       top: mousePos.y - 160,
-      background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
+      background: 'radial-gradient(circle, hsl(var(--primary) / 0.15) 0%, transparent 70%)',
       filter: 'blur(30px)'
     }} />
 
@@ -91,7 +91,7 @@ export const AuraHero = ({
           <div className="pt-8 animate-fade-in-up" style={{
           animationDelay: '0.8s'
         }}>
-            <button onClick={onStartReport} className="group relative px-12 py-6 rounded-full text-lg font-medium text-white
+            <button onClick={onStartReport} className="group relative px-12 py-6 rounded-full text-lg font-medium text-primary-foreground dark:text-background
                        bg-gradient-to-r from-primary via-primary to-secondary
                        shadow-lg transition-all duration-700 ease-out
                        hover:shadow-glow-lg hover:scale-105">
