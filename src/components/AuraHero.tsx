@@ -25,8 +25,8 @@ export const AuraHero = ({
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
   return <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">
-      {/* Background - Ethereal Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10" />
+      {/* Background - Ethereal Gradient with Motion */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10 animate-gradient-shift" />
       
       {/* Animated Orbs */}
       <div className="absolute inset-0 overflow-hidden">
