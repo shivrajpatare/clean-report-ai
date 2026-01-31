@@ -31,9 +31,9 @@ export const SymbiosisSection = () => {
   }, []);
 
   return (
-    <section className="relative py-32 overflow-hidden">
+    <section id="impact" className="relative py-32 overflow-hidden bg-background">
       {/* Watercolor Heat Map Background */}
-      <div className="absolute inset-0 gradient-ethereal opacity-50" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 dark:from-primary/10 dark:via-background dark:to-secondary/10" />
       
       <div className="absolute inset-0">
         {heatPoints.map((point, i) => (

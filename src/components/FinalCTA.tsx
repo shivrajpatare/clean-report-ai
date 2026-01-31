@@ -8,14 +8,14 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <section className="relative py-40 overflow-hidden">
+    <section className="relative py-40 overflow-hidden bg-background">
       {/* Twilight gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 to-accent/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 dark:via-secondary/5 to-accent/20 dark:to-accent/10" />
       
       {/* Ocean-like wave effect */}
       <div className="absolute inset-0">
         <svg
-          className="absolute bottom-0 w-full h-64 opacity-20"
+          className="absolute bottom-0 w-full h-64 opacity-20 dark:opacity-30"
           viewBox="0 0 1440 320"
           preserveAspectRatio="none"
         >
@@ -38,11 +38,11 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
       {/* Floating orbs */}
       <div className="absolute inset-0">
         <div 
-          className="absolute w-96 h-96 rounded-full bg-secondary/10 blur-ethereal animate-float"
+          className="absolute w-96 h-96 rounded-full bg-secondary/10 dark:bg-secondary/20 blur-ethereal animate-float"
           style={{ top: '20%', left: '10%' }}
         />
         <div 
-          className="absolute w-80 h-80 rounded-full bg-accent/10 blur-soft animate-drift"
+          className="absolute w-80 h-80 rounded-full bg-accent/10 dark:bg-accent/20 blur-soft animate-drift"
           style={{ bottom: '20%', right: '15%', animationDelay: '-3s' }}
         />
       </div>
@@ -65,7 +65,7 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
               onClick={onStartReport}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
-              className="group relative px-16 py-7 rounded-full text-xl font-medium text-white
+              className="group relative px-16 py-7 rounded-full text-xl font-medium text-primary-foreground dark:text-background
                        transition-all duration-700 ease-out"
               style={{
                 background: isHovered
@@ -73,8 +73,8 @@ export const FinalCTA = ({ onStartReport }: FinalCTAProps) => {
                   : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)',
                 transform: isHovered ? 'scale(1.05)' : 'scale(1)',
                 boxShadow: isHovered
-                  ? '0 0 80px hsl(var(--primary) / 0.4), 0 0 120px hsl(var(--secondary) / 0.3)'
-                  : '0 20px 60px hsl(var(--primary) / 0.2)',
+                  ? '0 0 80px hsl(var(--primary) / 0.5), 0 0 120px hsl(var(--secondary) / 0.4)'
+                  : '0 20px 60px hsl(var(--primary) / 0.3)',
               }}
             >
               <span className="relative z-10 flex items-center gap-4">
