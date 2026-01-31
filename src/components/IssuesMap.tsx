@@ -196,35 +196,35 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
         <div ref={mapContainerRef} className="h-full w-full" />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 glass-panel rounded-2xl p-4 z-[1000]">
-          <h4 className="text-xs font-medium text-foreground/60 mb-3 tracking-wide">Legend</h4>
-          <div className="space-y-2.5">
+        <div className="absolute bottom-6 left-4 bg-background/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 z-[1000] shadow-xl">
+          <h4 className="text-xs font-medium text-foreground/70 mb-3 tracking-wide">Status Legend</h4>
+          <div className="space-y-3">
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-warning to-orange-500 shadow-lg shadow-warning/30" />
-              <span className="text-foreground/60 font-light">Awaiting</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-warning to-orange-500 shadow-lg shadow-warning/40" />
+              <span className="text-foreground/70 font-light">Awaiting</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-secondary to-blue-500 shadow-lg shadow-secondary/30" />
-              <span className="text-foreground/60 font-light">In Flow</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-secondary to-blue-500 shadow-lg shadow-secondary/40" />
+              <span className="text-foreground/70 font-light">In Flow</span>
             </div>
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-success to-emerald-500 shadow-lg shadow-success/30" />
-              <span className="text-foreground/60 font-light">Restored</span>
+              <div className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-success to-emerald-500 shadow-lg shadow-success/40" />
+              <span className="text-foreground/70 font-light">Restored</span>
             </div>
           </div>
         </div>
 
         {/* Stats Card */}
-        <div className="absolute top-4 right-4 glass-panel rounded-2xl p-4 z-[1000]">
-          <h4 className="text-xs font-medium text-foreground/60 mb-3 tracking-wide">Overview</h4>
+        <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 z-[1000] shadow-xl min-w-[180px]">
+          <h4 className="text-xs font-medium text-foreground/70 mb-3 tracking-wide">Overview</h4>
           <div className="grid grid-cols-2 gap-3">
-            <div className="text-center p-3 rounded-xl bg-gradient-to-br from-warning/10 to-orange-500/5">
+            <div className="text-center p-3 rounded-xl bg-warning/10 border border-warning/20">
               <div className="text-2xl font-light text-warning">{statusCounts.pending}</div>
-              <div className="text-xs text-foreground/40 font-light">Awaiting</div>
+              <div className="text-xs text-foreground/50 font-light mt-1">Awaiting</div>
             </div>
-            <div className="text-center p-3 rounded-xl bg-gradient-to-br from-secondary/10 to-blue-500/5">
+            <div className="text-center p-3 rounded-xl bg-secondary/10 border border-secondary/20">
               <div className="text-2xl font-light text-secondary">{statusCounts.progress}</div>
-              <div className="text-xs text-foreground/40 font-light">In Flow</div>
+              <div className="text-xs text-foreground/50 font-light mt-1">In Flow</div>
             </div>
           </div>
         </div>
