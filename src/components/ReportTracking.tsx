@@ -1,5 +1,18 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, MapPin, Clock, CheckCircle, AlertCircle, Truck, MessageSquare, ChevronRight, Sparkles, RefreshCw, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Truck,
+  MessageSquare,
+  ChevronRight,
+  Sparkles,
+  RefreshCw,
+  ThumbsUp,
+  ThumbsDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -46,15 +59,16 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('reports')
-        .select('*')
-        .order('created_at', { ascending: false })
+        .from("public_reports") // Use secure view
+        .select("*")
+        .order("created_at", { ascending: false })
         .limit(20);
 
       if (error) throw error;
+      // @ts-ignore - view types might not be generated yet
       setReports(data || []);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error("Error fetching reports:", error);
       toast({
         title: "Error",
         description: "Could not load reports",
@@ -71,24 +85,27 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
 
   const handleFeedback = async (reportId: string, verified: boolean) => {
     try {
-      const { error } = await supabase
-        .from('reports')
-        .update({ 
-          citizen_verified: verified,
-          citizen_feedback: verified ? 'Confirmed resolved' : 'Still not fixed'
-        })
-        .eq('id', reportId);
+      // Use secure RPC instead of direct update
+      const { error } = await supabase.rpc("submit_report_feedback", {
+        report_id: reportId,
+        verified: verified,
+      });
 
       if (error) throw error;
-      
+
       toast({
         title: "Feedback Submitted",
         description: verified ? "Thank you for confirming!" : "We'll follow up on this.",
       });
-      
+
       fetchReports();
     } catch (error) {
-      console.error('Error submitting feedback:', error);
+      console.error("Error submitting feedback:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit feedback",
+        variant: "destructive",
+      });
     }
   };
 
@@ -149,10 +166,10 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
     const now = new Date();
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
-    
-    if (hours < 1) return 'Just now';
+
+    if (hours < 1) return "Just now";
     if (hours < 24) return `${hours}h ago`;
-    if (hours < 48) return 'Yesterday';
+    if (hours < 48) return "Yesterday";
     return date.toLocaleDateString();
   };
 
@@ -162,13 +179,21 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
         {/* Ambient background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-drift" />
-          <div className="absolute bottom-40 left-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-3s" }} />
+          <div
+            className="absolute bottom-40 left-10 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift"
+            style={{ animationDelay: "-3s" }}
+          />
         </div>
 
         {/* Header */}
         <div className="relative p-4">
           <div className="glass-panel rounded-2xl px-5 py-4 flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => setSelectedReport(null)} className="rounded-xl hover:bg-white/10">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSelectedReport(null)}
+              className="rounded-xl hover:bg-white/10"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex-1">
@@ -198,9 +223,7 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
                   <span className="font-light">{selectedReport.address}</span>
                 </div>
                 {selectedReport.ai_description && (
-                  <p className="text-sm text-foreground/60 mt-3 font-light">
-                    {selectedReport.ai_description}
-                  </p>
+                  <p className="text-sm text-foreground/60 mt-3 font-light">{selectedReport.ai_description}</p>
                 )}
               </div>
             </div>
@@ -211,9 +234,9 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
             <div className="space-y-3">
               <h4 className="text-sm font-light text-foreground/60 px-2">Reported Image</h4>
               <div className="glass-panel p-3 rounded-2xl">
-                <img 
-                  src={selectedReport.before_image_url} 
-                  alt="Before" 
+                <img
+                  src={selectedReport.before_image_url}
+                  alt="Before"
                   className="w-full h-48 object-cover rounded-xl"
                 />
               </div>
@@ -221,33 +244,29 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
           )}
 
           {/* After Image (if resolved) */}
-          {selectedReport.status === 'resolved' && selectedReport.after_image_url && (
+          {selectedReport.status === "resolved" && selectedReport.after_image_url && (
             <div className="space-y-3">
               <h4 className="text-sm font-light text-foreground/60 px-2">After Cleanup</h4>
               <div className="glass-panel p-3 rounded-2xl">
-                <img 
-                  src={selectedReport.after_image_url} 
-                  alt="After" 
-                  className="w-full h-48 object-cover rounded-xl"
-                />
+                <img src={selectedReport.after_image_url} alt="After" className="w-full h-48 object-cover rounded-xl" />
               </div>
             </div>
           )}
 
           {/* Citizen Feedback (for resolved reports) */}
-          {selectedReport.status === 'resolved' && selectedReport.citizen_verified === null && (
+          {selectedReport.status === "resolved" && selectedReport.citizen_verified === null && (
             <div className="glass-panel p-6 rounded-2xl space-y-4">
               <h4 className="font-medium text-foreground/80">Was this issue actually resolved?</h4>
               <p className="text-sm text-foreground/50 font-light">Your feedback helps improve city services</p>
               <div className="flex gap-3">
-                <Button 
+                <Button
                   onClick={() => handleFeedback(selectedReport.id, true)}
                   className="flex-1 bg-success/20 hover:bg-success/30 text-success"
                 >
                   <ThumbsUp className="w-5 h-5 mr-2" />
                   Yes, fixed!
                 </Button>
-                <Button 
+                <Button
                   onClick={() => handleFeedback(selectedReport.id, false)}
                   variant="outline"
                   className="flex-1 border-destructive/30 text-destructive hover:bg-destructive/10"
@@ -260,10 +279,12 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
           )}
 
           {selectedReport.citizen_verified !== null && (
-            <div className={`glass-panel p-5 rounded-2xl ${selectedReport.citizen_verified ? 'bg-success/5' : 'bg-warning/5'}`}>
+            <div
+              className={`glass-panel p-5 rounded-2xl ${selectedReport.citizen_verified ? "bg-success/5" : "bg-warning/5"}`}
+            >
               <p className="text-sm font-light">
-                {selectedReport.citizen_verified 
-                  ? "✅ You confirmed this issue was resolved" 
+                {selectedReport.citizen_verified
+                  ? "✅ You confirmed this issue was resolved"
                   : "⚠️ You reported this is still not fixed - we're following up"}
               </p>
             </div>
@@ -276,7 +297,7 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
               <div className="flex gap-4">
                 <div className="flex flex-col items-center">
                   <div className="w-4 h-4 rounded-full bg-gradient-to-br from-primary to-secondary ring-4 ring-primary/20" />
-                  {selectedReport.status !== 'pending' && (
+                  {selectedReport.status !== "pending" && (
                     <div className="w-0.5 h-16 bg-gradient-to-b from-foreground/20 to-foreground/5" />
                   )}
                 </div>
@@ -285,12 +306,14 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
                   <p className="text-xs text-foreground/40 font-light mt-1">{formatDate(selectedReport.created_at)}</p>
                 </div>
               </div>
-              
-              {selectedReport.status !== 'pending' && (
+
+              {selectedReport.status !== "pending" && (
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
-                    <div className={`w-4 h-4 rounded-full ${selectedReport.status === 'resolved' ? 'bg-foreground/20' : 'bg-gradient-to-br from-primary to-secondary ring-4 ring-primary/20'}`} />
-                    {selectedReport.status === 'resolved' && (
+                    <div
+                      className={`w-4 h-4 rounded-full ${selectedReport.status === "resolved" ? "bg-foreground/20" : "bg-gradient-to-br from-primary to-secondary ring-4 ring-primary/20"}`}
+                    />
+                    {selectedReport.status === "resolved" && (
                       <div className="w-0.5 h-16 bg-gradient-to-b from-foreground/20 to-foreground/5" />
                     )}
                   </div>
@@ -300,8 +323,8 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
                   </div>
                 </div>
               )}
-              
-              {selectedReport.status === 'resolved' && (
+
+              {selectedReport.status === "resolved" && (
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="w-4 h-4 rounded-full bg-gradient-to-br from-success to-emerald-400 ring-4 ring-success/20" />
@@ -309,7 +332,7 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
                   <div>
                     <p className="text-sm font-light text-foreground/80">Issue resolved</p>
                     <p className="text-xs text-foreground/40 font-light mt-1">
-                      {selectedReport.resolved_at ? formatDate(selectedReport.resolved_at) : 'Recently'}
+                      {selectedReport.resolved_at ? formatDate(selectedReport.resolved_at) : "Recently"}
                     </p>
                   </div>
                 </div>
@@ -326,7 +349,10 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
       {/* Ambient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-drift" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift" style={{ animationDelay: "-3s" }} />
+        <div
+          className="absolute bottom-20 right-20 w-80 h-80 bg-secondary/10 rounded-full blur-3xl animate-drift"
+          style={{ animationDelay: "-3s" }}
+        />
       </div>
 
       {/* Header */}
@@ -340,7 +366,7 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
             <p className="text-sm text-foreground/50 font-light">{reports.length} reports found</p>
           </div>
           <Button variant="ghost" size="icon" onClick={fetchReports} className="rounded-xl hover:bg-white/10">
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
@@ -399,9 +425,7 @@ export const ReportTracking = ({ onBack }: ReportTrackingProps) => {
       <div className="p-4">
         <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-full glass-card">
           <Sparkles className="w-5 h-5 text-primary animate-pulse-glow" />
-          <p className="text-sm text-foreground/50 font-light">
-            Every report helps make the city cleaner
-          </p>
+          <p className="text-sm text-foreground/50 font-light">Every report helps make the city cleaner</p>
         </div>
       </div>
     </div>
