@@ -26,8 +26,7 @@ export const HeroSection = ({ onStartReport }: HeroSectionProps) => {
             </Badge>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-balance">
-              Keep Your City
-              <span className="gradient-hero bg-clip-text text-transparent"> Clean & Beautiful</span>
+              Keep Your City Clean & Beautiful
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg text-balance">
