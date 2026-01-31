@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, MapPin, Filter, Layers } from "lucide-react";
+import { ArrowLeft, MapPin, Filter, Layers, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -11,45 +11,45 @@ interface IssuesMapProps {
   onBack: () => void;
 }
 
-// Custom marker icons
-const createCustomIcon = (color: string) => {
+// Custom marker icons with organic styling
+const createCustomIcon = (color: string, glowColor: string) => {
   return L.divIcon({
     className: "custom-marker",
     html: `<div style="
-      background: ${color};
-      width: 32px;
-      height: 32px;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      background: linear-gradient(135deg, ${color}, ${glowColor});
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.9);
+      box-shadow: 0 4px 20px ${color}40, 0 0 30px ${color}20;
+      animation: breath 3s ease-in-out infinite;
     "></div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14],
   });
 };
 
 const statusIcons = {
-  pending: createCustomIcon("hsl(38, 92%, 50%)"),
-  progress: createCustomIcon("hsl(199, 89%, 48%)"),
-  resolved: createCustomIcon("hsl(142, 71%, 45%)"),
+  pending: createCustomIcon("hsl(38, 92%, 50%)", "hsl(25, 95%, 53%)"),
+  progress: createCustomIcon("hsl(199, 89%, 48%)", "hsl(217, 91%, 60%)"),
+  resolved: createCustomIcon("hsl(152, 76%, 36%)", "hsl(160, 84%, 39%)"),
 };
 
 // Mock data - Pune area reports
 const mockReports = [
-  { id: "CSA-2024-00847", location: "FC Road, Shivajinagar", type: "Street Garbage", status: "pending", date: "Today, 10:30 AM", lat: 18.5285, lng: 73.8410, severity: "high" },
-  { id: "CSA-2024-00832", location: "Koregaon Park", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5362, lng: 73.8939, severity: "medium" },
-  { id: "CSA-2024-00798", location: "Kothrud, Paud Road", type: "Organic Waste", status: "resolved", date: "2 days ago", lat: 18.5074, lng: 73.8077, severity: "low" },
-  { id: "CSA-2024-00815", location: "Viman Nagar", type: "Street Garbage", status: "pending", date: "Today, 8:15 AM", lat: 18.5679, lng: 73.9143, severity: "high" },
-  { id: "CSA-2024-00820", location: "Hinjewadi Phase 1", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5912, lng: 73.7380, severity: "medium" },
-  { id: "CSA-2024-00788", location: "Aundh, ITI Road", type: "Organic Waste", status: "resolved", date: "3 days ago", lat: 18.5590, lng: 73.8077, severity: "low" },
-  { id: "CSA-2024-00795", location: "Hadapsar, Magarpatta", type: "Street Garbage", status: "pending", date: "Today, 9:00 AM", lat: 18.5089, lng: 73.9260, severity: "high" },
-  { id: "CSA-2024-00810", location: "Baner Road", type: "Construction Debris", status: "progress", date: "2 days ago", lat: 18.5590, lng: 73.7868, severity: "medium" },
-  { id: "CSA-2024-00778", location: "Kalyani Nagar", type: "Street Garbage", status: "resolved", date: "4 days ago", lat: 18.5463, lng: 73.9020, severity: "high" },
-  { id: "CSA-2024-00825", location: "Sinhagad Road", type: "Organic Waste", status: "pending", date: "Today, 7:45 AM", lat: 18.4818, lng: 73.8223, severity: "low" },
-  { id: "CSA-2024-00830", location: "Wakad", type: "Construction Debris", status: "progress", date: "Yesterday", lat: 18.5998, lng: 73.7603, severity: "medium" },
-  { id: "CSA-2024-00785", location: "Camp, MG Road", type: "Street Garbage", status: "resolved", date: "5 days ago", lat: 18.5167, lng: 73.8803, severity: "high" },
+  { id: "AUR-00847", location: "FC Road, Shivajinagar", type: "Street Friction", status: "pending", date: "Today, 10:30 AM", lat: 18.5285, lng: 73.8410, severity: "high" },
+  { id: "AUR-00832", location: "Koregaon Park", type: "Construction Residue", status: "progress", date: "Yesterday", lat: 18.5362, lng: 73.8939, severity: "medium" },
+  { id: "AUR-00798", location: "Kothrud, Paud Road", type: "Organic Matter", status: "resolved", date: "2 days ago", lat: 18.5074, lng: 73.8077, severity: "low" },
+  { id: "AUR-00815", location: "Viman Nagar", type: "Street Friction", status: "pending", date: "Today, 8:15 AM", lat: 18.5679, lng: 73.9143, severity: "high" },
+  { id: "AUR-00820", location: "Hinjewadi Phase 1", type: "Construction Residue", status: "progress", date: "Yesterday", lat: 18.5912, lng: 73.7380, severity: "medium" },
+  { id: "AUR-00788", location: "Aundh, ITI Road", type: "Organic Matter", status: "resolved", date: "3 days ago", lat: 18.5590, lng: 73.8077, severity: "low" },
+  { id: "AUR-00795", location: "Hadapsar, Magarpatta", type: "Street Friction", status: "pending", date: "Today, 9:00 AM", lat: 18.5089, lng: 73.9260, severity: "high" },
+  { id: "AUR-00810", location: "Baner Road", type: "Construction Residue", status: "progress", date: "2 days ago", lat: 18.5590, lng: 73.7868, severity: "medium" },
+  { id: "AUR-00778", location: "Kalyani Nagar", type: "Street Friction", status: "resolved", date: "4 days ago", lat: 18.5463, lng: 73.9020, severity: "high" },
+  { id: "AUR-00825", location: "Sinhagad Road", type: "Organic Matter", status: "pending", date: "Today, 7:45 AM", lat: 18.4818, lng: 73.8223, severity: "low" },
+  { id: "AUR-00830", location: "Wakad", type: "Construction Residue", status: "progress", date: "Yesterday", lat: 18.5998, lng: 73.7603, severity: "medium" },
+  { id: "AUR-00785", location: "Camp, MG Road", type: "Street Friction", status: "resolved", date: "5 days ago", lat: 18.5167, lng: 73.8803, severity: "high" },
 ];
 
 type StatusFilter = "all" | "pending" | "progress" | "resolved";
@@ -77,7 +77,8 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
 
     const map = L.map(mapContainerRef.current).setView([18.5204, 73.8567], 12);
     
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    // Use a softer, more ethereal map style
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
@@ -93,23 +94,21 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
   useEffect(() => {
     if (!mapRef.current) return;
 
-    // Remove existing cluster group
     if (clusterGroupRef.current) {
       mapRef.current.removeLayer(clusterGroupRef.current);
     }
 
-    // Create new cluster group
     const markers = L.markerClusterGroup({
       chunkedLoading: true,
       iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
-        let size = 40;
-        if (count > 10) size = 50;
-        if (count > 25) size = 60;
+        let size = 44;
+        if (count > 10) size = 54;
+        if (count > 25) size = 64;
         
         return L.divIcon({
           html: `<div style="
-            background: linear-gradient(135deg, hsl(160, 84%, 39%), hsl(199, 89%, 48%));
+            background: linear-gradient(135deg, hsl(152, 76%, 36%), hsl(199, 89%, 48%));
             width: ${size}px;
             height: ${size}px;
             border-radius: 50%;
@@ -117,10 +116,11 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
-            font-size: ${size / 3}px;
-            border: 3px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-weight: 400;
+            font-size: ${size / 2.5}px;
+            border: 3px solid rgba(255,255,255,0.9);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 0 40px hsl(152, 76%, 36%, 0.2);
+            font-family: 'Plus Jakarta Sans', sans-serif;
           ">${count}</div>`,
           className: "custom-cluster-icon",
           iconSize: L.point(size, size),
@@ -134,40 +134,42 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
       });
       
       const popupContent = `
-        <div style="min-width: 180px; padding: 4px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span style="font-family: monospace; font-size: 11px; color: #666;">${report.id}</span>
+        <div style="min-width: 200px; padding: 8px; font-family: 'Plus Jakarta Sans', sans-serif;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-family: monospace; font-size: 11px; color: hsl(0, 0%, 45%);">${report.id}</span>
             <span style="
-              background: ${report.status === 'pending' ? '#f59e0b' : report.status === 'progress' ? '#0ea5e9' : '#22c55e'};
+              background: linear-gradient(135deg, ${report.status === 'pending' ? 'hsl(38, 92%, 50%), hsl(25, 95%, 53%)' : report.status === 'progress' ? 'hsl(199, 89%, 48%), hsl(217, 91%, 60%)' : 'hsl(152, 76%, 36%), hsl(160, 84%, 39%)'});
               color: white;
-              padding: 2px 8px;
+              padding: 4px 12px;
               border-radius: 9999px;
               font-size: 10px;
-              font-weight: 500;
-            ">${report.status === 'progress' ? 'In Progress' : report.status.charAt(0).toUpperCase() + report.status.slice(1)}</span>
+              font-weight: 400;
+            ">${report.status === 'progress' ? 'In Flow' : report.status === 'pending' ? 'Awaiting' : 'Restored'}</span>
           </div>
-          <h3 style="font-weight: 600; font-size: 14px; margin-bottom: 4px;">${report.type}</h3>
-          <div style="display: flex; align-items: center; gap: 4px; color: #666; font-size: 12px; margin-bottom: 8px;">
+          <h3 style="font-weight: 500; font-size: 15px; margin-bottom: 6px; color: hsl(0, 0%, 20%);">${report.type}</h3>
+          <div style="display: flex; align-items: center; gap: 6px; color: hsl(0, 0%, 45%); font-size: 12px; margin-bottom: 10px;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
             ${report.location}
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
-            <span style="color: #666;">${report.date}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; padding-top: 8px; border-top: 1px solid hsl(0, 0%, 90%);">
+            <span style="color: hsl(0, 0%, 55%);">${report.date}</span>
             <span style="
-              background: ${report.severity === 'high' ? '#ef4444' : report.severity === 'medium' ? '#f59e0b' : '#22c55e'}20;
-              color: ${report.severity === 'high' ? '#ef4444' : report.severity === 'medium' ? '#f59e0b' : '#22c55e'};
-              padding: 2px 6px;
-              border-radius: 4px;
+              background: ${report.severity === 'high' ? 'hsl(0, 84%, 60%, 0.1)' : report.severity === 'medium' ? 'hsl(38, 92%, 50%, 0.1)' : 'hsl(152, 76%, 36%, 0.1)'};
+              color: ${report.severity === 'high' ? 'hsl(0, 84%, 60%)' : report.severity === 'medium' ? 'hsl(38, 92%, 50%)' : 'hsl(152, 76%, 36%)'};
+              padding: 3px 10px;
+              border-radius: 8px;
               font-weight: 500;
             ">${report.severity}</span>
           </div>
         </div>
       `;
       
-      marker.bindPopup(popupContent);
+      marker.bindPopup(popupContent, {
+        className: 'aura-popup',
+      });
       markers.addLayer(marker);
     });
 
@@ -176,37 +178,53 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
 
   }, [filteredReports]);
 
+  const filterLabels = {
+    all: "All Ripples",
+    pending: "Awaiting",
+    progress: "In Flow",
+    resolved: "Restored"
+  };
+
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col bg-gradient-to-b from-background to-primary/5">
       {/* Header */}
-      <div className="flex items-center gap-4 p-4 border-b border-border bg-background/95 backdrop-blur-sm">
-        <Button variant="ghost" size="icon" onClick={onBack}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <h2 className="font-semibold">Issues Map</h2>
-          <p className="text-sm text-muted-foreground">{filteredReports.length} reports in Pune</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Layers className="w-4 h-4 text-muted-foreground" />
+      <div className="relative p-4 z-[1001]">
+        <div className="glass-panel rounded-2xl px-5 py-4 flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl hover:bg-white/10">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <h2 className="font-medium text-foreground/80 tracking-wide">City Flow Map</h2>
+            <p className="text-sm text-foreground/50 font-light">{filteredReports.length} ripples in Pune</p>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full glass-card">
+            <Sparkles className="w-4 h-4 text-primary animate-pulse-glow" />
+            <span className="text-sm font-light text-foreground/60">Live</span>
+          </div>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="flex items-center gap-2 p-3 bg-muted/30 border-b border-border overflow-x-auto">
-        <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-        {(["all", "pending", "progress", "resolved"] as StatusFilter[]).map((status) => (
-          <Button
-            key={status}
-            variant={filter === status ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilter(status)}
-            className="shrink-0"
-          >
-            {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
-            <span className="ml-1 text-xs opacity-70">({statusCounts[status]})</span>
-          </Button>
-        ))}
+      <div className="relative px-4 pb-4 z-[1001]">
+        <div className="glass-card rounded-2xl p-3 flex items-center gap-3 overflow-x-auto">
+          <Filter className="w-4 h-4 text-foreground/40 shrink-0 ml-2" />
+          {(["all", "pending", "progress", "resolved"] as StatusFilter[]).map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-light transition-all duration-300 ${
+                filter === status
+                  ? 'bg-gradient-to-r from-primary/80 to-secondary/80 text-white shadow-lg shadow-primary/20'
+                  : 'glass-card hover:bg-white/10 text-foreground/60'
+              }`}
+            >
+              {filterLabels[status]}
+              <span className={`ml-2 ${filter === status ? 'text-white/70' : 'text-foreground/40'}`}>
+                ({statusCounts[status]})
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Map Container */}
@@ -214,39 +232,57 @@ export const IssuesMap = ({ onBack }: IssuesMapProps) => {
         <div ref={mapContainerRef} className="h-full w-full" />
 
         {/* Legend */}
-        <div className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-border z-[1000]">
-          <h4 className="text-xs font-semibold mb-2">Legend</h4>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded-full bg-warning" />
-              <span>Pending</span>
+        <div className="absolute bottom-4 left-4 glass-panel rounded-2xl p-4 z-[1000]">
+          <h4 className="text-xs font-medium text-foreground/60 mb-3 tracking-wide">Legend</h4>
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-warning to-orange-500 shadow-lg shadow-warning/30" />
+              <span className="text-foreground/60 font-light">Awaiting</span>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded-full bg-secondary" />
-              <span>In Progress</span>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-secondary to-blue-500 shadow-lg shadow-secondary/30" />
+              <span className="text-foreground/60 font-light">In Flow</span>
             </div>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded-full bg-success" />
-              <span>Resolved</span>
+            <div className="flex items-center gap-3 text-sm">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-success to-emerald-500 shadow-lg shadow-success/30" />
+              <span className="text-foreground/60 font-light">Restored</span>
             </div>
           </div>
         </div>
 
         {/* Stats Card */}
-        <div className="absolute top-4 right-4 bg-background/95 backdrop-blur-sm rounded-xl p-3 shadow-lg border border-border z-[1000]">
-          <h4 className="text-xs font-semibold mb-2">Overview</h4>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="text-center p-2 bg-muted rounded-lg">
-              <div className="font-bold text-lg text-warning">{statusCounts.pending}</div>
-              <div className="text-muted-foreground">Pending</div>
+        <div className="absolute top-4 right-4 glass-panel rounded-2xl p-4 z-[1000]">
+          <h4 className="text-xs font-medium text-foreground/60 mb-3 tracking-wide">Overview</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="text-center p-3 rounded-xl bg-gradient-to-br from-warning/10 to-orange-500/5">
+              <div className="text-2xl font-light text-warning">{statusCounts.pending}</div>
+              <div className="text-xs text-foreground/40 font-light">Awaiting</div>
             </div>
-            <div className="text-center p-2 bg-muted rounded-lg">
-              <div className="font-bold text-lg text-secondary">{statusCounts.progress}</div>
-              <div className="text-muted-foreground">In Progress</div>
+            <div className="text-center p-3 rounded-xl bg-gradient-to-br from-secondary/10 to-blue-500/5">
+              <div className="text-2xl font-light text-secondary">{statusCounts.progress}</div>
+              <div className="text-xs text-foreground/40 font-light">In Flow</div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Custom popup styles */}
+      <style>{`
+        .aura-popup .leaflet-popup-content-wrapper {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border-radius: 16px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .aura-popup .leaflet-popup-tip {
+          background: rgba(255, 255, 255, 0.95);
+        }
+        @keyframes breath {
+          0%, 100% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.05); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 };
