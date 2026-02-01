@@ -389,6 +389,98 @@ For partnership inquiries, visit the Circular Economy Network portal at `/partne
 
 ---
 
+## AI and Data Sources
+
+### Models
+
+| Model | Provider | Purpose |
+|-------|----------|---------|
+| Gemini 2.5 Flash | Google via Lovable AI Gateway | Image classification and severity assessment |
+
+The platform uses zero-shot classification without custom training data. The model analyzes uploaded images in real-time and returns structured JSON with category, confidence score, and description.
+
+### Data Sources
+
+| Data Type | Source | License |
+|-----------|--------|---------|
+| Map tiles | OpenStreetMap | ODbL |
+| Geocoding | Nominatim | ODbL |
+| Report images | User uploads | Platform ToS |
+| Location data | Device GPS | User consent |
+
+All civic reports are user-generated. No synthetic data is used in production. Historical report data remains within the platform database and is not shared externally.
+
+---
+
+## Evaluation and Guardrails
+
+### Confidence Thresholds
+
+The AI assigns a confidence score (0 to 1) with each classification. Reports with confidence below 0.5 are flagged for manual review by administrators.
+
+### Human-in-the-Loop Verification
+
+Municipal administrators (Keepers) review AI-detected categories and severity levels through the dashboard before dispatching field teams. This prevents incorrect classifications from wasting resources.
+
+### Bias Mitigation
+
+- Category definitions are explicit and documented in the system prompt
+- Priority levels are rule-based (mapped from category), not AI-determined
+- All reports receive equal initial visibility regardless of location
+
+### Privacy Protections
+
+- Reporter contact information (name, phone) is excluded from public views
+- Public map shows issue details without personal identifiers
+- Row Level Security enforces data access boundaries
+
+### Rate Limiting
+
+- AI endpoint implements rate limiting (429 responses) to prevent abuse
+- Credit exhaustion returns 402 with clear messaging
+
+---
+
+## Known Limitations and Risks
+
+### Current Limitations
+
+| Limitation | Impact | Planned Resolution |
+|------------|--------|-------------------|
+| English only | Excludes non-English speakers | Multi-language support in roadmap |
+| GPS required | Cannot report without location services | Address-based fallback planned |
+| Online only | No offline reporting capability | Local queue with sync under consideration |
+| Single city | Currently designed for Pune | Multi-city architecture in development |
+
+### Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Model hallucination | Medium | Medium | 0.5 confidence threshold + human review |
+| Spam submissions | Medium | Low | Rate limiting + duplicate detection |
+| Location spoofing | Low | Medium | Cross-reference with known landmarks |
+| Image manipulation | Low | Low | AI consistency checks + admin verification |
+
+### Not Yet Implemented
+
+- Predictive analytics for issue forecasting
+- Automated field team routing
+- Citizen notification system for status updates
+- Integration with existing municipal software
+
+---
+
+## Team
+
+Built with dedication by:
+
+| Name | Role | Contact |
+|------|------|---------|
+| Shivraj Patare | AI/ML Integration & Frontend | shivrajpatarre@gmail.com |
+| Soham Ghadge | Backend & Research | sohamghadge7900@gmail.com |
+
+---
+
 ## License
 
 MIT License
