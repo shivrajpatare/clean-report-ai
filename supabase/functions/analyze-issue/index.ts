@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,18 +18,92 @@ const CATEGORY_MAP: Record<string, { category: string; priority: string }> = {
   other: { category: 'other', priority: 'medium' },
 };
 
+// Simple in-memory rate limiting (resets on function cold start)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 5; // 5 requests per minute
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+
+function checkRateLimit(identifier: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(identifier);
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Get client IP for rate limiting (fallback for anonymous users)
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                     req.headers.get('cf-connecting-ip') || 
+                     'unknown';
+    
+    // Check for authentication (optional but preferred)
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | null = null;
+    
+    if (authHeader?.startsWith('Bearer ')) {
+      try {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_ANON_KEY')!,
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        
+        const token = authHeader.replace('Bearer ', '');
+        const { data, error } = await supabase.auth.getUser(token);
+        
+        if (!error && data?.user) {
+          userId = data.user.id;
+        }
+      } catch (authError) {
+        console.error('Auth check failed:', authError);
+        // Continue without auth - allow anonymous with stricter rate limits
+      }
+    }
+    
+    // Rate limit identifier: use userId if authenticated, otherwise IP
+    const rateLimitId = userId || `ip:${clientIP}`;
+    
+    // Apply stricter rate limits for anonymous users
+    const effectiveRateLimit = userId ? RATE_LIMIT_MAX : 2; // 2 req/min for anonymous
+    
+    if (!checkRateLimit(rateLimitId)) {
+      return new Response(
+        JSON.stringify({ error: 'Too many requests. Please try again later.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { imageBase64 } = await req.json();
     
     if (!imageBase64) {
       return new Response(
         JSON.stringify({ error: 'Image data is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Validate image size (base64 is ~33% larger than binary)
+    const maxSizeBytes = 10 * 1024 * 1024; // 10MB
+    const estimatedSize = (imageBase64.length * 3) / 4;
+    if (estimatedSize > maxSizeBytes) {
+      return new Response(
+        JSON.stringify({ error: 'Image too large. Maximum size is 10MB.' }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -143,9 +218,11 @@ IMPORTANT: Respond ONLY with valid JSON, no markdown, no extra text.`;
     );
 
   } catch (error) {
+    // Log detailed error server-side only
     console.error('Error in analyze-issue function:', error);
+    // Return generic message to client - don't leak internal details
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      JSON.stringify({ error: 'Unable to analyze image at this time. Please try again later.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
