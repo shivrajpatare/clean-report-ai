@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import auraLeafIcon from "@/assets/aura-leaf-icon.png";
 
 interface AuraHeroProps {
   onStartReport: () => void;
@@ -98,21 +99,22 @@ export const AuraHero = ({ onStartReport }: AuraHeroProps) => {
               </p>
             </div>
 
-            {/* CTA Button */}
-            <div className="pt-4 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            {/* CTA Icon */}
+            <div className="pt-8 animate-fade-in-up flex flex-col items-center gap-4" style={{ animationDelay: '0.6s' }}>
               <button 
                 onClick={onStartReport} 
-                className="group relative px-12 py-6 rounded-full text-lg font-medium text-primary-foreground dark:text-background
-                           bg-gradient-to-r from-primary via-primary to-secondary
-                           shadow-lg transition-all duration-700 ease-out
-                           hover:shadow-glow-lg hover:scale-105 hover-glow-pulse"
+                className="group relative w-28 h-28 transition-all duration-700 ease-out hover:scale-110"
               >
-                <span className="relative z-10 flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  Begin the Bloom
-                </span>
-                <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <img 
+                  src={auraLeafIcon} 
+                  alt="Begin the Bloom" 
+                  className="w-full h-full object-contain drop-shadow-lg transition-all duration-500 group-hover:drop-shadow-2xl"
+                />
+                <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
               </button>
+              <span className="text-lg font-medium text-foreground/80">
+                Begin the Bloom
+              </span>
             </div>
 
             {/* Trust indicator */}
