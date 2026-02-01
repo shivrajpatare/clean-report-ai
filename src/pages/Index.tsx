@@ -72,7 +72,8 @@ const Index = () => {
       <AuraNavbar 
         onTrackReports={handleTrackReports} 
         onAdminDashboard={handleAdminDashboard} 
-        onMapView={handleMapView} 
+        onMapView={handleMapView}
+        onStartReport={handleStartReport}
       />
       <main>
         <AuraHero onStartReport={handleStartReport} />
