@@ -78,17 +78,14 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView, onStar
                   <TooltipTrigger asChild>
                     <button
                       onClick={onStartReport}
-                      className="group relative w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary 
-                                 shadow-md hover:shadow-lg hover:shadow-primary/30 
-                                 transition-all duration-300 hover:scale-110 
-                                 flex items-center justify-center overflow-hidden
+                      className="group relative transition-all duration-300 hover:scale-110 
                                  focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-foreground/80"
                       aria-label="Report an Issue"
                     >
                       <img 
                         src={auraLeafIcon} 
                         alt="" 
-                        className="w-6 h-6 object-contain drop-shadow-sm"
+                        className="w-8 h-8 object-contain drop-shadow-md transition-all duration-300 group-hover:drop-shadow-lg"
                       />
                     </button>
                   </TooltipTrigger>
@@ -140,17 +137,14 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView, onStar
                     <TooltipTrigger asChild>
                       <button
                         onClick={onStartReport}
-                        className="group relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary 
-                                   shadow-md hover:shadow-lg hover:shadow-primary/30 
-                                   transition-all duration-300 hover:scale-110 
-                                   flex items-center justify-center overflow-hidden
+                        className="group relative transition-all duration-300 hover:scale-110 
                                    focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
                         aria-label="Report an Issue"
                       >
                         <img 
                           src={auraLeafIcon} 
                           alt="" 
-                          className="w-7 h-7 object-contain drop-shadow-sm"
+                          className="w-9 h-9 object-contain drop-shadow-md transition-all duration-300 group-hover:drop-shadow-lg"
                         />
                       </button>
                     </TooltipTrigger>
