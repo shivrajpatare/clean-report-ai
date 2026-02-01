@@ -2,8 +2,7 @@ import { Eye, Heart, Leaf, ArrowRight, Camera } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 /* Visual Cue Components */
-const WitnessVisual = () => (
-  <div className="relative w-16 h-12 mx-auto mb-4 overflow-hidden rounded-lg bg-muted/50 dark:bg-muted/30 border border-border/30">
+const WitnessVisual = () => <div className="relative w-16 h-12 mx-auto mb-4 overflow-hidden rounded-lg bg-muted/50 dark:bg-muted/30 border border-border/30">
     {/* Polaroid-style street scene */}
     <div className="absolute inset-1 bg-gradient-to-b from-secondary/40 to-primary/20 rounded">
       {/* Building silhouettes */}
@@ -15,12 +14,9 @@ const WitnessVisual = () => (
     </div>
     {/* Corner accent */}
     <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-primary/40 rounded-tl-lg" />
-  </div>
-);
-
+  </div>;
 const CaptureVisual = () => {
   const [isShuttering, setIsShuttering] = useState(false);
-  
   useEffect(() => {
     const interval = setInterval(() => {
       setIsShuttering(true);
@@ -28,9 +24,7 @@ const CaptureVisual = () => {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
-
-  return (
-    <div className="relative w-16 h-12 mx-auto mb-4 flex items-center justify-center">
+  return <div className="relative w-16 h-12 mx-auto mb-4 flex items-center justify-center">
       {/* Camera body */}
       <div className="relative w-12 h-10 bg-muted/50 dark:bg-muted/30 rounded-lg border border-border/30 flex items-center justify-center">
         {/* Lens */}
@@ -42,24 +36,14 @@ const CaptureVisual = () => {
       </div>
       {/* Shutter overlay */}
       <div className={`absolute inset-0 bg-white/90 rounded-lg transition-opacity duration-100 pointer-events-none ${isShuttering ? 'opacity-100' : 'opacity-0'}`} />
-    </div>
-  );
+    </div>;
 };
-
-const ConnectVisual = () => (
-  <div className="relative w-16 h-12 mx-auto mb-4 flex items-center justify-center">
+const ConnectVisual = () => <div className="relative w-16 h-12 mx-auto mb-4 flex items-center justify-center">
     {/* Node A */}
     <div className="absolute left-1 w-3 h-3 rounded-full bg-primary/60 animate-pulse" />
     {/* Flowing line */}
     <svg className="w-10 h-4 overflow-visible" viewBox="0 0 40 16">
-      <path
-        d="M4 8 Q20 2 36 8 Q20 14 4 8"
-        fill="none"
-        stroke="url(#flowGradient)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        className="animate-flow-path"
-      />
+      <path d="M4 8 Q20 2 36 8 Q20 14 4 8" fill="none" stroke="url(#flowGradient)" strokeWidth="2" strokeLinecap="round" className="animate-flow-path" />
       {/* Animated dots along path */}
       <circle r="2" fill="hsl(var(--primary))">
         <animateMotion dur="2s" repeatCount="indefinite">
@@ -76,115 +60,95 @@ const ConnectVisual = () => (
       </defs>
     </svg>
     {/* Node B */}
-    <div className="absolute right-1 w-3 h-3 rounded-full bg-secondary/60 animate-pulse" style={{ animationDelay: '0.5s' }} />
-  </div>
-);
-
+    <div className="absolute right-1 w-3 h-3 rounded-full bg-secondary/60 animate-pulse" style={{
+    animationDelay: '0.5s'
+  }} />
+  </div>;
 const TransformVisual = () => {
   const [sliderPos, setSliderPos] = useState(30);
-  
   useEffect(() => {
     const interval = setInterval(() => {
       setSliderPos(prev => prev === 30 ? 70 : 30);
     }, 2000);
     return () => clearInterval(interval);
   }, []);
-
-  return (
-    <div className="relative w-16 h-12 mx-auto mb-4 rounded-lg overflow-hidden border border-border/30">
+  return <div className="relative w-16 h-12 mx-auto mb-4 rounded-lg overflow-hidden border border-border/30">
       {/* Before (dirty) */}
       <div className="absolute inset-0 bg-gradient-to-br from-muted-foreground/30 to-muted-foreground/10">
         <div className="absolute bottom-1 left-1 w-2 h-2 rounded-sm bg-muted-foreground/40" />
         <div className="absolute bottom-2 left-4 w-1.5 h-1.5 rounded-sm bg-muted-foreground/30" />
       </div>
       {/* After (clean) - clips based on slider */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 transition-all duration-700 ease-in-out"
-        style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-      >
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 transition-all duration-700 ease-in-out" style={{
+      clipPath: `inset(0 ${100 - sliderPos}% 0 0)`
+    }}>
         <Leaf className="absolute bottom-1 left-2 w-3 h-3 text-primary/60" />
       </div>
       {/* Slider handle */}
-      <div 
-        className="absolute top-0 bottom-0 w-0.5 bg-white shadow-md transition-all duration-700 ease-in-out"
-        style={{ left: `${sliderPos}%` }}
-      >
+      <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-md transition-all duration-700 ease-in-out" style={{
+      left: `${sliderPos}%`
+    }}>
         <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2 h-4 bg-white rounded-full shadow-md" />
       </div>
-    </div>
-  );
+    </div>;
 };
-
 const visualComponents = [WitnessVisual, CaptureVisual, ConnectVisual, TransformVisual];
-
 export const PulseSection = () => {
   const [visibleCards, setVisibleCards] = useState<boolean[]>([false, false, false, false]);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-
   useEffect(() => {
     const observers = cardsRef.current.map((card, index) => {
       if (!card) return null;
-      
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisibleCards(prev => {
-              const newState = [...prev];
-              newState[index] = true;
-              return newState;
-            });
-            observer.unobserve(card);
-          }
-        },
-        { threshold: 0.2, rootMargin: "0px 0px -50px 0px" }
-      );
-      
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCards(prev => {
+            const newState = [...prev];
+            newState[index] = true;
+            return newState;
+          });
+          observer.unobserve(card);
+        }
+      }, {
+        threshold: 0.2,
+        rootMargin: "0px 0px -50px 0px"
+      });
       observer.observe(card);
       return observer;
     });
-
     return () => {
       observers.forEach(observer => observer?.disconnect());
     };
   }, []);
-
-  const journey = [
-    {
-      icon: Eye,
-      step: "01",
-      title: "Witness",
-      subtitle: "See what others overlook",
-      description: "That overflowing bin. The faded park bench. The forgotten corner where weeds meet litter. You notice what the city has forgotten.",
-      impact: "Every observation is an act of care",
-    },
-    {
-      icon: Camera,
-      step: "02", 
-      title: "Capture",
-      subtitle: "One photo, infinite data",
-      description: "Aura's AI instantly decodes the scene—material types, environmental risk, optimal cleanup approach. What takes humans hours, happens in seconds.",
-      impact: "AI-powered precision routing",
-    },
-    {
-      icon: Heart,
-      step: "03",
-      title: "Connect",
-      subtitle: "Your voice reaches the right ears",
-      description: "No bureaucratic maze. No lost reports. Your observation flows directly to local Keepers who are equipped, trained, and ready to act.",
-      impact: "Direct line to action",
-    },
-    {
-      icon: Leaf,
-      step: "04",
-      title: "Transform",
-      subtitle: "Watch your impact bloom",
-      description: "Track resolution in real-time. See the before and after. Celebrate with your community as spaces are restored to their natural beauty.",
-      impact: "Visible, measurable change",
-    },
-  ];
-
-  return (
-    <section id="pulse" className="relative py-32 overflow-hidden">
+  const journey = [{
+    icon: Eye,
+    step: "01",
+    title: "Witness",
+    subtitle: "See what others overlook",
+    description: "That overflowing bin. The faded park bench. The forgotten corner where weeds meet litter. You notice what the city has forgotten.",
+    impact: "Every observation is an act of care"
+  }, {
+    icon: Camera,
+    step: "02",
+    title: "Capture",
+    subtitle: "One photo, infinite data",
+    description: "Aura's AI instantly decodes the scene—material types, environmental risk, optimal cleanup approach. What takes humans hours, happens in seconds.",
+    impact: "AI-powered precision routing"
+  }, {
+    icon: Heart,
+    step: "03",
+    title: "Connect",
+    subtitle: "Your voice reaches the right ears",
+    description: "No bureaucratic maze. No lost reports. Your observation flows directly to local Keepers who are equipped, trained, and ready to act.",
+    impact: "Direct line to action"
+  }, {
+    icon: Leaf,
+    step: "04",
+    title: "Transform",
+    subtitle: "Watch your impact bloom",
+    description: "Track resolution in real-time. See the before and after. Celebrate with your community as spaces are restored to their natural beauty.",
+    impact: "Visible, measurable change"
+  }];
+  return <section id="pulse" className="relative py-32 overflow-hidden">
       {/* Background layers */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background dark:via-muted/10" />
       
@@ -216,18 +180,12 @@ export const PulseSection = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
             {journey.map((item, index) => {
-              const VisualCue = visualComponents[index];
-              return (
-                <div
-                  key={index}
-                  ref={(el) => { cardsRef.current[index] = el; }}
-                  className={`group relative transition-all duration-700 ease-out ${
-                    visibleCards[index] 
-                      ? 'opacity-100 translate-y-0' 
-                      : 'opacity-0 translate-y-8'
-                  }`}
-                  style={{ transitionDelay: `${index * 150}ms` }}
-                >
+            const VisualCue = visualComponents[index];
+            return <div key={index} ref={el => {
+              cardsRef.current[index] = el;
+            }} className={`group relative transition-all duration-700 ease-out ${visibleCards[index] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{
+              transitionDelay: `${index * 150}ms`
+            }}>
                   {/* Card */}
                   <div className="glass-panel p-8 h-full transition-all duration-500 hover:shadow-glow group-hover:-translate-y-2">
                     {/* Visual Cue */}
@@ -262,14 +220,11 @@ export const PulseSection = () => {
                   </div>
 
                   {/* Arrow connector (not on last item) */}
-                  {index < journey.length - 1 && (
-                    <div className="hidden lg:flex absolute top-1/2 -right-2 z-10 w-4 h-4 items-center justify-center">
+                  {index < journey.length - 1 && <div className="hidden lg:flex absolute top-1/2 -right-2 z-10 w-4 h-4 items-center justify-center">
                       <ArrowRight className="w-4 h-4 text-muted-foreground/50" />
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    </div>}
+                </div>;
+          })}
           </div>
         </div>
 
@@ -283,10 +238,7 @@ export const PulseSection = () => {
               <h3 className="text-2xl md:text-3xl font-medium text-foreground mb-4">
                 Why This Matters
               </h3>
-              <p className="text-lg text-muted-foreground font-light leading-relaxed mb-6 max-w-2xl mx-auto">
-                Urban waste isn't just an eyesore—it's a symptom of disconnection between citizens and their city. 
-                Traditional reporting is slow, frustrating, and often ignored. 
-                <span className="text-foreground font-medium"> Aura bridges that gap</span>, 
+              <p className="text-lg text-muted-foreground font-light leading-relaxed mb-6 max-w-2xl mx-auto">Urban waste isn't just an eyesore it's a symptom of disconnection between citizens and their city. Traditional reporting is slow, frustrating, and often ignored. Aura bridges that gap, turning passive frustration into active restoration.<span className="text-foreground font-medium"> Aura bridges that gap</span>, 
                 turning passive frustration into active restoration.
               </p>
               
@@ -314,8 +266,6 @@ export const PulseSection = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default PulseSection;
