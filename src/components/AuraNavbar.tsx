@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Map, User, LayoutDashboard, Compass, Sparkles } from "lucide-react";
+import { Menu, X, Map, User, Compass, Sparkles } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import auraLeafIcon from "@/assets/aura-leaf-icon.png";
 
 interface AuraNavbarProps {
   onTrackReports: () => void;
   onAdminDashboard: () => void;
   onMapView: () => void;
+  onStartReport: () => void;
 }
 
-export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: AuraNavbarProps) => {
+export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView, onStartReport }: AuraNavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -66,6 +69,34 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
               <div className="w-px h-6 bg-white/20 mx-1" />
               
               <ThemeToggle variant="dock" />
+              
+              <div className="w-px h-6 bg-white/20 mx-1" />
+              
+              {/* Report Issue CTA */}
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={onStartReport}
+                      className="group relative w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary 
+                                 shadow-md hover:shadow-lg hover:shadow-primary/30 
+                                 transition-all duration-300 hover:scale-110 
+                                 flex items-center justify-center overflow-hidden
+                                 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 focus:ring-offset-foreground/80"
+                      aria-label="Report an Issue"
+                    >
+                      <img 
+                        src={auraLeafIcon} 
+                        alt="" 
+                        className="w-6 h-6 object-contain drop-shadow-sm"
+                      />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="bg-foreground text-background">
+                    Report an Issue
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </>
           ) : (
             /* Expanded mode - full navigation */
@@ -102,6 +133,33 @@ export const AuraNavbar = ({ onTrackReports, onAdminDashboard, onMapView }: Aura
                   Track My Report
                 </button>
                 <ThemeToggle />
+                
+                {/* Report Issue CTA - Expanded Mode */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={onStartReport}
+                        className="group relative w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary 
+                                   shadow-md hover:shadow-lg hover:shadow-primary/30 
+                                   transition-all duration-300 hover:scale-110 
+                                   flex items-center justify-center overflow-hidden
+                                   focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2"
+                        aria-label="Report an Issue"
+                      >
+                        <img 
+                          src={auraLeafIcon} 
+                          alt="" 
+                          className="w-7 h-7 object-contain drop-shadow-sm"
+                        />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      Report an Issue
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
                 <button
                   onClick={onAdminDashboard}
                   className="text-xs text-muted-foreground/70 hover:text-foreground font-light transition-colors duration-300"
