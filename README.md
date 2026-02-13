@@ -4,6 +4,8 @@
 
 A platform that helps cities detect, prioritize, and resolve urban sanitation issues using artificial intelligence and citizen participation.
 
+https://aura-ai-one-liard.vercel.app/
+
 ---
 
 ## Overview
